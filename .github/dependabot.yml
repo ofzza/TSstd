@@ -1,0 +1,18 @@
+version: 2
+
+updates:
+  # Toolchain updates, grouped into a single pull request per week. This repository is almost entirely
+  # devDependencies, so ungrouped updates would be mostly noise
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      dev-dependencies:
+        dependency-type: development
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
