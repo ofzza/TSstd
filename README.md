@@ -193,7 +193,7 @@ See `src/assert/index.test.ts` for the full suite written this way.
 - `npm run dev` - the same, in watch mode.
 - `npm test` - runs every `test:*` script.
   - `npm run test:unit` - a single Vitest invocation that executes test files, runs their runtime expectations, and type checks them, reporting type errors as test failures.
-- `npm run ci` - runs every `ci:*` script: build, ESLint, Prettier and the tests. This is what GitHub Actions runs on every pull request and on every push to `master`, against Node 22 and 24.
+- `npm run ci` - runs every `ci:*` script: build, ESLint, Prettier and the tests. This is what GitHub Actions runs on every pull request targeting `master` and on every push to `master`, against Node 22 and 24.
 
 # Contributing
 
@@ -209,6 +209,11 @@ For work-flow and general etiquette when contributing, please see:
 
 - [Git Source-Control Work-Flow](https://github.com/ofzza/onboarding/blob/master/CONTRIBUTING/git.md)
 - [GitHub Work-Flow](https://github.com/ofzza/onboarding/blob/master/CONTRIBUTING/github.md)
+
+This repository uses two long-lived branches:
+
+- `develop` - the work-in-progress trunk. **Create all feature branches from `develop`, and target all pull requests at `develop`.**
+- `master` - always contains the latest stable released version. It only ever gets merged into from `develop`, when a stable version is released.
 
 Please accompany any work, fix or feature with their own issue, in it's own branch (see [Git Source-Control Work-Flow](https://github.com/ofzza/onboarding/blob/master/CONTRIBUTING/git.md) for branch naming conventions), and once done, request merge via pull request.
 
