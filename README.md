@@ -193,7 +193,7 @@ See `src/assert/index.test.ts` for the full suite written this way.
 - `npm run dev` - the same, in watch mode.
 - `npm test` - runs every `test:*` script.
   - `npm run test:unit` - a single Vitest invocation that executes test files, runs their runtime expectations, and type checks them, reporting type errors as test failures.
-- `npm run ci` - runs every `ci:*` script: build, ESLint, Prettier and the tests. This is what GitHub Actions runs on every pull request and on every push to `master`, against Node 20, 22 and 24.
+- `npm run ci` - runs every `ci:*` script: build, ESLint, Prettier and the tests. This is what GitHub Actions runs on every pull request and on every push to `master`, against Node 22 and 24.
 
 # Contributing
 
