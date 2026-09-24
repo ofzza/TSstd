@@ -112,7 +112,10 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 - **`prepare` builds during install**, so `npm ci` compiles once and `ci:build` compiles again. Verified: `prepare` does run on `npm ci`. The duplicate build costs about a second and is accepted.
 - **The real Node floor is 20.19.0 / 22.13.0 / 24.0.0**, not the bare major versions — imposed by `vite@8` (`^20.19.0 || >=22.12.0`) and `eslint-visitor-keys@5` (`^20.19.0 || ^22.13.0 || >=24`). `actions/setup-node` with `node-version: 20` resolves to the latest 20.x and satisfies this; a pinned older patch would not. There is no `engines` field declaring this.
 - **`package.json` has no `files` field**, so the published tarball also ships `src/`, tests, `tsconfig*.json`, `vite.config.ts`, `.vscode/` and `CLAUDE.md` — about 57 kB unpacked. Harmless but untidy; fix when touching package metadata.
-- **`package.json`'s `description` is stale** — it was copy-pasted from the sibling `jsonschema-reflect-ts` repo and describes JSON-schema data-model tooling this library does not do. Left in place deliberately; fix it next time package metadata is touched.
+- **`package.json` has no `dependencies`, and must stay that way while the library is types-only.** Anything listed there is installed for every consumer. `@types/node` in particular is a devDependency, needed only by `eslint.config.js` — nothing in `src/` uses Node APIs.
+- **`@types/node` is pinned to the lowest supported Node major** (currently `^20`), so type checking cannot silently rely on APIs newer than the CI matrix floor. `.github/dependabot.yml` ignores its semver-major updates for this reason; bump it by hand together with the matrix.
+- **`@eslint/js` must be a direct devDependency.** `eslint.config.js` imports it, and since ESLint 10 it is no longer pulled in transitively by `eslint`.
+- **Vitest 5 is not adopted yet** — it requires Node `^22.12.0 || ^24 || >=26` and `@types/node` `^22 || >=24`, so taking it means dropping Node 20 from the CI matrix (and from the supported range). Expect Dependabot's grouped dev-dependencies PR to keep proposing it and failing until that decision is made; the `typecheck.spawnTimeout` workaround in `vite.config.ts` should be re-checked when it is.
 - **`tsconfig.json` excludes test files**, so `npm run build` will never report a type error in a test. Use `npm test` (the `unit` project type checks them) or `tsc --noEmit -p tsconfig.test.json`.
 - `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json`.
 - The recommended VS Code extension set includes `orta.vscode-twoslash-queries`, which powers the `// ^?` type-inspection comments used in sibling repos.
@@ -124,7 +127,7 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 
 **A workflow alone does not block merges.** Making it mandatory requires branch protection on `master` in GitHub repo settings, marking `CI / Node 20`, `CI / Node 22` and `CI / Node 24` as required status checks. That is a repo setting, not a file in this repository.
 
-`.github/` also holds `pull_request_template.md` (adapted from the author's template in the `kickstart` repo) and `dependabot.yml` (weekly npm and github-actions updates, with devDependencies grouped into one pull request).
+`.github/` also holds `pull_request_template.md` (adapted from the author's template in the `kickstart` repo) and `dependabot.yml` (weekly npm and github-actions updates, with devDependencies grouped into one pull request, and `@types/node` majors ignored).
 
 ## Exports
 
