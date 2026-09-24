@@ -27,6 +27,11 @@ Any code sample added to `README.md` must be verified against `tsc` before being
 - **Currently types-only.** Nothing in `src/` emits runtime code, so `dist/assert/index.js` is just `export {}`. The first runtime export will change assumptions in several places — re-read [Gotchas](#gotchas-and-known-issues) when adding one.
 - Toolchain last verified against: Node 24.15, npm 11.12, TypeScript 5.9.3, Vitest 5.0.1.
 
+## Branching
+
+- **`develop` is the work-in-progress trunk.** Create every feature, fix or dependency branch from `develop`, and open every pull request against `develop`.
+- **`master` holds only the latest stable release.** It is never committed to directly and never receives feature pull requests — it is only updated by merging `develop` into it when a stable version is released.
+
 ## Layout
 
 ```
@@ -123,6 +128,8 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs `npm ci && npm run ci` on every pull request targeting `master` and on every push to `master`, across a Node matrix of `[22, 24]` with `fail-fast: false`. In-progress runs are cancelled only for pull requests, never for `master`.
+
+**The workflow triggers do not yet match the [branching model](#branching).** It only watches `master`, so pull requests targeting `develop` — which is all of them — and pushes to `develop` get no CI run at all. Likewise `.github/dependabot.yml` sets no `target-branch`, so Dependabot opens its pull requests against the default branch rather than `develop`. Both need `develop` added.
 
 **A workflow alone does not block merges.** Making it mandatory requires branch protection on `master` in GitHub repo settings, marking `CI / Node 22` and `CI / Node 24` as required status checks. That is a repo setting, not a file in this repository.
 
