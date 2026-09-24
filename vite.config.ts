@@ -24,7 +24,7 @@ export default defineConfig({
             include: ['src/**/*.{test,unit.test,spec,unit.spec}.ts'],
             exclude: ['node_modules/**', 'dist/**'],
             tsconfig: './tsconfig.test.json',
-            // Vitest 4.1.11 applies no default for this, but consumes it unguarded when spawning the checker
+            // Vitest 5.0.1 documents, but does not apply, a default for this, but consumes it unguarded when spawning the checker
             spawnTimeout: 10000,
           },
         },
