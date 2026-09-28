@@ -1,14 +1,14 @@
 {
-  "name": "@ofzza/std-ts",
+  "name": "@ofzza/TSstd",
   "version": "1.0.0",
   "description": "TypeScript Standard library",
-  "homepage": "https://github.com/ofzza/std-ts#readme",
+  "homepage": "https://github.com/ofzza/TSstd#readme",
   "bugs": {
-    "url": "https://github.com/ofzza/std-ts/issues"
+    "url": "https://github.com/ofzza/TSstd/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ofzza/std-ts.git"
+    "url": "git+https://github.com/ofzza/TSstd.git"
   },
   "license": "MIT",
   "author": "ofzza",
