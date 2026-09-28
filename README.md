@@ -1,4 +1,4 @@
-# std-ts
+# TSstd
 
 TypeScript standard library, implementing commonly used TypeScript types, utility types and related functionality.
 
@@ -6,7 +6,7 @@ TypeScript standard library, implementing commonly used TypeScript types, utilit
 
 Jump to section:
 
-- [Get std-ts](#get-std-ts)
+- [Get TSstd](#get-TSstd)
 - [Type assertions](#type-assertions)
   - [`AssertTypeEquality<A, B>`](#asserttypeequalitya-b)
   - [`AssertTypeInequality<A, B>`](#asserttypeinequalitya-b)
@@ -17,18 +17,18 @@ Jump to section:
 - [Development](#development)
 - [Contributing](#contributing)
 
-# Get std-ts
+# Get TSstd
 
-To start using `std-ts` in your project, simply install it from NPM by running the following in your terminal:
+To start using `TSstd` in your project, simply install it from NPM by running the following in your terminal:
 
 ```sh
-$ npm install @ofzza/std-ts --save
+$ npm install @ofzza/TSstd --save
 ```
 
 The library currently exports only types, which are erased at compile time and leave nothing behind in your bundle, so it can just as well be installed as a development dependency:
 
 ```sh
-$ npm install @ofzza/std-ts --save-dev
+$ npm install @ofzza/TSstd --save-dev
 ```
 
 # Type assertions
@@ -38,7 +38,7 @@ Assertions let you verify, at compile time, that a type is what you think it is.
 Every assertion resolves to `true` when it holds and to `never` when it doesn't. `never` is used as the failure value because nothing is assignable to `never` - so the moment you try to consume a failed assertion, compilation breaks at exactly the line that got it wrong:
 
 ```ts
-import type { AssertTypeEquality } from '@ofzza/std-ts';
+import type { AssertTypeEquality } from '@ofzza/TSstd';
 
 const stringIsString: AssertTypeEquality<string, string> = true; // This will work
 const stringIsNumber: AssertTypeEquality<string, number> = true; // This will fail at compile time
@@ -145,21 +145,21 @@ true satisfies AssertTypeUnassignable<{ readonly a: string }, { a: string }>; //
 
 The two families answer genuinely different questions, and the cases where they disagree are the ones worth knowing. Reading "assignable" as `A` being assignable to `B`:
 
-| `A`                       | `B`                      | Equality | Assignable |
-| ------------------------- | ------------------------ | -------- | ---------- |
-| `string`                  | `string`                 | `true`   | `true`     |
-| `'a'`                     | `string`                 | `never`  | `true`     |
-| `any`                     | `unknown`                | `never`  | `true`     |
-| `any`                     | `string`                 | `never`  | `true`     |
-| `unknown`                 | `string`                 | `never`  | `never`    |
-| `never`                   | `never`                  | `true`   | `true`     |
-| `never`                   | `string`                 | `never`  | `true`     |
-| `'a' \| 'b'`              | `'a'`                    | `never`  | `never`    |
-| `boolean`                 | `true`                   | `never`  | `never`    |
-| `{ a: string }`           | `{ readonly a: string }` | `never`  | `true`     |
-| `{ a?: string }`          | `{ a: string \| undefined }` | `never`  | `never`    |
-| `{ a: string; b: number }` | `{ a: string }`         | `never`  | `true`     |
-| `[string]`                | `string[]`               | `never`  | `true`     |
+| `A`                        | `B`                          | Equality | Assignable |
+| -------------------------- | ---------------------------- | -------- | ---------- |
+| `string`                   | `string`                     | `true`   | `true`     |
+| `'a'`                      | `string`                     | `never`  | `true`     |
+| `any`                      | `unknown`                    | `never`  | `true`     |
+| `any`                      | `string`                     | `never`  | `true`     |
+| `unknown`                  | `string`                     | `never`  | `never`    |
+| `never`                    | `never`                      | `true`   | `true`     |
+| `never`                    | `string`                     | `never`  | `true`     |
+| `'a' \| 'b'`               | `'a'`                        | `never`  | `never`    |
+| `boolean`                  | `true`                       | `never`  | `never`    |
+| `{ a: string }`            | `{ readonly a: string }`     | `never`  | `true`     |
+| `{ a?: string }`           | `{ a: string \| undefined }` | `never`  | `never`    |
+| `{ a: string; b: number }` | `{ a: string }`              | `never`  | `true`     |
+| `[string]`                 | `string[]`                   | `never`  | `true`     |
 
 The row that catches most hand-written equality checks is `{ a: string }` vs `{ readonly a: string }`: the two are assignable in both directions, so a check built on mutual assignability will call them equal. `AssertTypeEquality` does not.
 
@@ -171,7 +171,7 @@ Write each assertion so it also registers as a regular expectation when the file
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import type { AssertTypeEquality } from '@ofzza/std-ts';
+import type { AssertTypeEquality } from '@ofzza/TSstd';
 
 describe('Uppercase', () => {
   it('Uppercases a string literal type', () => {

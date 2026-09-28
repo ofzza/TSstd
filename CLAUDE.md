@@ -21,7 +21,7 @@ Any code sample added to `README.md` must be verified against `tsc` before being
 
 ## Project
 
-`@ofzza/std-ts` — a TypeScript standard library of commonly used types, utility types and related functionality. MIT, published to NPM, built from `src/` to `dist/`.
+`@ofzza/TSstd` — a TypeScript standard library of commonly used types, utility types and related functionality. MIT, published to NPM, built from `src/` to `dist/`.
 
 - **ESM only** (`"type": "module"`). `main` is `dist/index.js`, `types` is `dist/index.d.ts`.
 - **Currently types-only.** Nothing in `src/` emits runtime code, so `dist/assert/index.js` is just `export {}`. The first runtime export will change assumptions in several places — re-read [Gotchas](#gotchas-and-known-issues) when adding one.
