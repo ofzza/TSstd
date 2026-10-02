@@ -14,6 +14,10 @@ Jump to section:
   - [`AssertTypeUnassignable<A, B>`](#asserttypeunassignablea-b)
   - [Equality vs. assignability](#equality-vs-assignability)
   - [Writing type level tests](#writing-type-level-tests)
+- [Arrays](#arrays)
+  - [`ArrayIsEmpty<TArray>`](#arrayisemptytarray)
+  - [`ArrayHead<TArray>`](#arrayheadtarray)
+  - [`ArrayTail<TArray>`](#arraytailtarray)
 - [Development](#development)
 - [Contributing](#contributing)
 
@@ -186,6 +190,67 @@ describe('Uppercase', () => {
 An unused `@ts-expect-error` is itself a compile error, so this catches regressions in both directions: an assertion that starts failing breaks the build, and so does one that was supposed to fail and no longer does.
 
 See `src/assert/index.test.ts` for the full suite written this way.
+
+# Arrays
+
+Utility types for taking arrays and tuples apart at the type level. All of them accept both mutable and `readonly` arrays and tuples - including ones produced by `as const` - and distribute over a union of them, so `ArrayHead<[1] | [2, 3]>` is `1 | 2`.
+
+Fixed length tuples resolve to exact answers. Plain arrays and tuples with optional or rest elements resolve to what can be known about them at compile time: a `string[]` may or may not be empty, so it is neither reported as empty nor as non-empty, and its first element may be `undefined`.
+
+---
+
+## `ArrayIsEmpty<TArray>`
+
+Checks if an array type is empty. Resolves to `true` for an empty tuple, to `false` for a tuple with at least one required element, and to `boolean` for an array type which may or may not be empty:
+
+```ts
+import type { AssertTypeEquality, ArrayIsEmpty } from '@ofzza/TSstd';
+
+true satisfies AssertTypeEquality<ArrayIsEmpty<[]>, true>; // This will work
+true satisfies AssertTypeEquality<ArrayIsEmpty<readonly [1, 2]>, false>; // This will work
+true satisfies AssertTypeEquality<ArrayIsEmpty<[...string[], 1]>, false>; // This will work, a required element anywhere makes a tuple non-empty
+true satisfies AssertTypeEquality<ArrayIsEmpty<string[]>, boolean>; // This will work, a plain array may or may not be empty
+true satisfies AssertTypeEquality<ArrayIsEmpty<[1?]>, boolean>; // This will work, and so may a tuple of only optional elements
+true satisfies AssertTypeEquality<ArrayIsEmpty<[] | [1]>, boolean>; // This will work, and so may a union of the two
+true satisfies AssertTypeEquality<ArrayIsEmpty<string[]>, false>; // This will fail at compile time
+```
+
+## `ArrayHead<TArray>`
+
+Gets the type of the first element of an array type, or `never` for an empty tuple. When the first element may not exist, its type is joined with `undefined`, which is what reading index `0` gives you at runtime:
+
+```ts
+import type { AssertTypeEquality, ArrayHead } from '@ofzza/TSstd';
+
+true satisfies AssertTypeEquality<ArrayHead<[1, 2, 3]>, 1>; // This will work
+true satisfies AssertTypeEquality<ArrayHead<readonly ['a', 'b']>, 'a'>; // This will work
+true satisfies AssertTypeEquality<ArrayHead<[]>, never>; // This will work, an empty tuple has no head
+true satisfies AssertTypeEquality<ArrayHead<[1?, 2?]>, 1 | undefined>; // This will work, the first element is optional
+true satisfies AssertTypeEquality<ArrayHead<string[]>, string | undefined>; // This will work, a plain array may be empty
+true satisfies AssertTypeEquality<ArrayHead<[...string[], 1]>, string | 1>; // This will work, the head may be any of the elements
+true satisfies AssertTypeEquality<ArrayHead<string[]>, string>; // This will fail at compile time
+```
+
+Note that the head of `[never]` is `never` as well, and cannot be told apart from the head of `[]` - use `ArrayIsEmpty` when the difference matters.
+
+## `ArrayTail<TArray>`
+
+Gets an array type of all the elements of an array type except the first one, or `never` for an empty tuple. The `readonly` modifier and element labels of the source array type are preserved:
+
+```ts
+import type { AssertTypeEquality, ArrayTail } from '@ofzza/TSstd';
+
+true satisfies AssertTypeEquality<ArrayTail<[1, 2, 3]>, [2, 3]>; // This will work
+true satisfies AssertTypeEquality<ArrayTail<readonly [1, 2, 3]>, readonly [2, 3]>; // This will work, `readonly` is preserved
+true satisfies AssertTypeEquality<ArrayTail<[a: 1, b: 2]>, [b: 2]>; // This will work, labels are preserved
+true satisfies AssertTypeEquality<ArrayTail<[1]>, []>; // This will work
+true satisfies AssertTypeEquality<ArrayTail<[]>, never>; // This will work, an empty tuple has no tail
+true satisfies AssertTypeEquality<ArrayTail<[1?, 2?]>, [2?]>; // This will work
+true satisfies AssertTypeEquality<ArrayTail<string[]>, string[]>; // This will work, the tail of a plain array is the same plain array
+true satisfies AssertTypeEquality<ArrayTail<readonly [1, 2, 3]>, [2, 3]>; // This will fail at compile time
+```
+
+The tail of a tuple starting with a rest element, like `[...string[], 1]`, is widened to a plain array of all its element types, `(string | 1)[]`.
 
 # Development
 
