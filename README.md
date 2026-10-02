@@ -18,6 +18,10 @@ Jump to section:
   - [`ArrayIsEmpty<TArray>`](#arrayisemptytarray)
   - [`ArrayHead<TArray>`](#arrayheadtarray)
   - [`ArrayTail<TArray>`](#arraytailtarray)
+- [Objects](#objects)
+  - [`ObjectIsEmpty<TObject>`](#objectisemptytobject)
+  - [`ObjectKeys<TObject>`](#objectkeystobject)
+  - [`ObjectValues<TObject>`](#objectvaluestobject)
 - [Development](#development)
 - [Contributing](#contributing)
 
@@ -251,6 +255,67 @@ true satisfies AssertTypeEquality<ArrayTail<readonly [1, 2, 3]>, [2, 3]>; // Thi
 ```
 
 The tail of a tuple starting with a rest element, like `[...string[], 1]`, is widened to a plain array of all its element types, `(string | 1)[]`.
+
+# Objects
+
+Utility types for taking object types apart at the type level. All of them accept any object type - object literal types, interfaces, mapped types and records - and distribute over a union of them, so `ObjectKeys<{ a: 1 } | { b: 2 }>` is `['a'] | ['b']`.
+
+Keys and values are resolved to tuples. **The order of their elements is unspecified**: TypeScript orders the members of a union by the order in which the compiler happened to create them, not by the order they were declared in, so `ObjectKeys<{ b: 1; a: 2 }>` may be `['a', 'b']` or `['b', 'a']`. What is guaranteed is that `ObjectValues` is aligned with `ObjectKeys` - the value at any index is the type of the property whose key is at the same index.
+
+---
+
+## `ObjectIsEmpty<TObject>`
+
+Checks if an object type is empty. Resolves to `true` for an object type with no known keys, to `false` for an object type with at least one required property, and to `boolean` for an object type which may or may not be empty:
+
+```ts
+import type { AssertTypeEquality, ObjectIsEmpty } from '@ofzza/TSstd';
+
+true satisfies AssertTypeEquality<ObjectIsEmpty<{}>, true>; // This will work
+true satisfies AssertTypeEquality<ObjectIsEmpty<{ a: 1; b?: 2 }>, false>; // This will work, a single required property makes an object type non-empty
+true satisfies AssertTypeEquality<ObjectIsEmpty<{ a?: 1 }>, boolean>; // This will work, an object type of only optional properties may or may not be empty
+true satisfies AssertTypeEquality<ObjectIsEmpty<Record<string, number>>, boolean>; // This will work, and so may one with an index signature
+true satisfies AssertTypeEquality<ObjectIsEmpty<{} | { a: 1 }>, boolean>; // This will work, and so may a union of the two
+true satisfies AssertTypeEquality<ObjectIsEmpty<{ a?: 1 }>, true>; // This will fail at compile time
+```
+
+Note that `object` has no known keys either, and resolves to `true` just like `{}`.
+
+## `ObjectKeys<TObject>`
+
+Gets a tuple type of all the keys of an object type - string, number and symbol keys, of optional and `readonly` properties alike - in an unspecified order. An object type with no known keys resolves to an empty tuple:
+
+```ts
+import type { AssertTypeEquality, ObjectKeys } from '@ofzza/TSstd';
+
+true satisfies AssertTypeEquality<ObjectKeys<{ a: 1 }>, ['a']>; // This will work
+true satisfies AssertTypeEquality<ObjectKeys<{ readonly a?: 1 }>, ['a']>; // This will work, property modifiers do not matter
+true satisfies AssertTypeEquality<ObjectKeys<{}>, []>; // This will work
+true satisfies AssertTypeEquality<ObjectKeys<{ a: 1; b: 2; 0: 3 }>[number], 'a' | 'b' | 0>; // This will work, whatever the order of the keys
+true satisfies AssertTypeEquality<ObjectKeys<{ a: 1; b: 2; 0: 3 }>['length'], 3>; // This will work
+true satisfies AssertTypeEquality<ObjectKeys<Record<string, number>>, [string]>; // This will work, an index signature contributes its key type
+true satisfies AssertTypeEquality<ObjectKeys<{ a: 1 }>, 'a'>; // This will fail at compile time, the keys are a tuple and not a union
+```
+
+Note that TypeScript reports the keys of a written out `string` index signature as `string | number`, so `ObjectKeys<{ [key: string]: 1 }>` holds both a `string` and a `number` element, while `ObjectKeys<Record<string, 1>>` is just `[string]`.
+
+## `ObjectValues<TObject>`
+
+Gets a tuple type of the types of all the properties of an object type, aligned with `ObjectKeys` - the value at any index belongs to the key at the same index. The type of an optional property is joined with `undefined`:
+
+```ts
+import type { AssertTypeEquality, ObjectKeys, ObjectValues } from '@ofzza/TSstd';
+
+type Point = { x: 'X'; y: 'Y' };
+
+true satisfies AssertTypeEquality<ObjectValues<{ a: 1 }>, [1]>; // This will work
+true satisfies AssertTypeEquality<ObjectValues<{ a?: 1 }>, [1 | undefined]>; // This will work, an optional property may hold `undefined`
+true satisfies AssertTypeEquality<ObjectValues<{}>, []>; // This will work
+true satisfies AssertTypeEquality<ObjectValues<Point>[number], 'X' | 'Y'>; // This will work, whatever the order of the values
+true satisfies AssertTypeEquality<ObjectValues<Point>[0], Point[ObjectKeys<Point>[0]]>; // This will work, values are aligned with keys
+true satisfies AssertTypeEquality<ObjectValues<Point>[1], Point[ObjectKeys<Point>[1]]>; // This will work
+true satisfies AssertTypeEquality<ObjectValues<{ a?: 1 }>, [1]>; // This will fail at compile time
+```
 
 # Development
 
