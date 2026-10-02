@@ -21,9 +21,10 @@ Any code sample added to `README.md` must be verified against `tsc` before being
 
 ## Project
 
-`@ofzza/TSstd` — a TypeScript standard library of commonly used types, utility types and related functionality. MIT, published to NPM, built from `src/` to `dist/`.
+TSstd — a TypeScript standard library of commonly used types, utility types and related functionality. MIT, published to NPM as **`@ofzza/tsstd`** (npm names must be lowercase; "TSstd" is only the display name), built from `src/` to `dist/`.
 
-- **ESM only** (`"type": "module"`). `main` is `dist/index.js`, `types` is `dist/index.d.ts`.
+- **ESM only** (`"type": "module"`). The entry point is the `exports` map (`.` → `types: ./dist/index.d.ts`, `default: ./dist/index.js`, plus `./package.json`); `main` and `types` mirror it for older tooling.
+- **Only `dist/` is published** (`files: ["dist"]`; npm adds `README.md`, `LICENSE` and `package.json` itself). `sideEffects: false`, and `publishConfig.access: public` because scoped packages otherwise publish as restricted.
 - **Currently types-only.** Nothing in `src/` emits runtime code, so `dist/assert/index.js` is just `export {}`. The first runtime export will change assumptions in several places — re-read [Gotchas](#gotchas-and-known-issues) when adding one.
 - Toolchain last verified against: Node 24.15, npm 11.12, TypeScript 5.9.3, Vitest 5.0.1.
 
@@ -48,7 +49,7 @@ src/
     index.test.ts          Tests, colocated, asserting results with `src/assert`
 tsconfig.json              Build config. EXCLUDES *.test.ts / *.spec.ts
 tsconfig.test.json         Typecheck config. Includes everything, emits nothing
-vite.config.ts             Three Vitest projects: debug, unit, types
+vite.config.ts             Two Vitest projects: debug, unit
 dist/                      Build output, gitignored
 ```
 
@@ -56,12 +57,14 @@ One directory per module under `src/`, each an `index.ts` + `index.test.ts` pair
 
 ## Commands
 
-- `npm run build` — `tsc`, compiles `src/` to `dist/` with declarations.
+- `npm run clean` — deletes `dist/` (cross-platform, via `node -e`).
+- `npm run build` — `tsc`, compiles `src/` to `dist/` with declarations. `prebuild` runs `clean` first, so renamed or removed modules never leave stale output behind to be published.
 - `npm run dev` — the same in watch mode.
 - `npm test` — runs every `test:*` script.
   - `npm run test:unit` — `vitest run --project unit`, a single invocation that both executes tests and type checks them.
 - `npm run ci` — runs every `ci:*` script: `ci:build`, `ci:eslint`, `ci:prettier`, `ci:test-unit`. This is what GitHub Actions runs.
 - `npm run prepare` — builds; invoked automatically by a local `npm install`/`npm ci` and before `npm publish`, but **not** when the package is installed as a dependency.
+- `prepublishOnly` — runs `npm run ci` before `npm publish`, so a failing build is never published.
 
 **Script wiring matters when adding one.** `test` is `npm-run-all test:*` and `ci` is `npm-run-all ci:*`, so a new `test:<name>` joins `npm test` automatically — but it will _not_ run in CI until a matching `ci:test-<name>` script exists. Add both.
 
@@ -77,7 +80,7 @@ Vitest, with `describe`/`it`/`expect` imported explicitly (`globals` is not enab
 
   `typecheck.spawnTimeout` is pinned to `10000` because Vitest 5.0.1 documents a `10_000` default for it but never applies one, yet consumes it unguarded when spawning the checker, which leaves an intermittent race.
 
-- **`debug`** — `include: ['src/**/*.{debug}.{js,ts}']`, i.e. files ending in `.debug.ts` / `.debug.js`. Driven by the "TS: Debug Current Test File" launch config in `.vscode/launch.json`. Separately, `.gitignore` excludes `*.debug.test.ts` — those match the `unit` glob, so scratch debug tests run locally but are never committed.
+- **`debug`** — `include: ['src/**/*.{debug}.{js,ts}']`, i.e. files ending in `.debug.ts` / `.debug.js`. Intended to be driven by a local "debug current test file" launch config; no `.vscode/` files are currently committed. Separately, `.gitignore` excludes `*.debug.test.ts` — those match the `unit` glob, so scratch debug tests run locally but are never committed.
 
 `tsconfig.test.json` exists because `tsconfig.json` excludes `*.test.ts` from the build — without it nothing would ever type check the test files, and compile-time assertions in them would be silently inert.
 
@@ -125,22 +128,25 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 - **Never use `npm ci --ignore-scripts` here.** `unrs-resolver` (`postinstall`) and `@parcel/watcher` (`install`) rely on their install hooks to link native bindings; skipping them risks breaking ESLint. The CI workflow uses plain `npm ci` for this reason.
 - **`prepare` builds during install**, so `npm ci` compiles once and `ci:build` compiles again. Verified: `prepare` does run on `npm ci`. The duplicate build costs about a second and is accepted.
 - **The real Node floor is 22.13.0 / 24.0.0**, not the bare major versions — imposed by `vitest@5` (`^22.12.0 || ^24.0.0 || >=26.0.0`), `vite@8` (`^20.19.0 || >=22.12.0`) and `eslint-visitor-keys@5` (`^22.13.0 || >=24`). Node 20 is not supported. `actions/setup-node` with `node-version: 22` resolves to the latest 22.x and satisfies this; a pinned older patch would not. There is no `engines` field declaring this.
-- **`package.json` has no `files` field**, so the published tarball also ships `src/`, tests, `tsconfig*.json`, `vite.config.ts`, `.vscode/` and `CLAUDE.md` — about 57 kB unpacked. Harmless but untidy; fix when touching package metadata.
+- **npm package names must be lowercase.** `@ofzza/TSstd` is rejected for new packages ("name can no longer contain capital letters"); the package is `@ofzza/tsstd`. GitHub URLs are case-insensitive, so `repository`/`homepage` keep `TSstd`.
+- **`files: ["dist"]` is an allowlist.** Anything else that must ship has to be added there. Check with `npm pack --dry-run`.
+- **The `exports` map seals deep imports.** Only `.` and `./package.json` resolve, so `@ofzza/tsstd/dist/array/index.js` fails under `node16`/`nodenext`/`bundler`. A new module only needs re-exporting from `src/index.ts`; add an `exports` subpath only if it should be importable on its own.
+- **Do not add a `paths` alias to `tsconfig.json`.** TSC does not rewrite aliased specifiers on emit, so they would ship to `dist/` unresolvable.
+- **Do not add an `engines` field for the dev-toolchain Node floor.** It would restrict consumers of a types-only package for no reason.
 - **`package.json` has no `dependencies`, and must stay that way while the library is types-only.** Anything listed there is installed for every consumer. `@types/node` in particular is a devDependency, needed only by `eslint.config.js` — nothing in `src/` uses Node APIs.
 - **`@types/node` is pinned to the lowest supported Node major** (currently `^22`), so type checking cannot silently rely on APIs newer than the CI matrix floor. `.github/dependabot.yml` ignores its semver-major updates for this reason; bump it by hand together with the matrix.
 - **`@eslint/js` must be a direct devDependency.** `eslint.config.js` imports it, and since ESLint 10 it is no longer pulled in transitively by `eslint`.
 - **`tsconfig.json` excludes test files**, so `npm run build` will never report a type error in a test. Use `npm test` (the `unit` project type checks them) or `tsc --noEmit -p tsconfig.test.json`.
 - **The element order of `ObjectKeys` / `ObjectValues` is unspecified.** They turn the `keyof` union into a tuple, and TSC orders union members by internal type-creation order, not declaration order. Never assert an exact tuple for more than one key — assert `[number]`, `['length']` and per-index key/value alignment instead, as `src/object/index.test.ts` does.
 - **`keyof` of an index signature depends on how it is written:** `keyof { [key: string]: X }` is `string | number`, but `keyof Record<string, X>` is just `string`.
-- `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json`.
-- The recommended VS Code extension set includes `orta.vscode-twoslash-queries`, which powers the `// ^?` type-inspection comments used in sibling repos.
+- `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json` — none of which are currently committed.
 - **Not yet adopted:** the sibling `ts-std` repo keeps a `src/readme.spec.ts` whose `describe`/`it` tree mirrors its README headings 1:1, turning documentation examples into executable tests. This repo has no equivalent — consider adding one if the README grows.
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs `npm ci && npm run ci` on every pull request targeting `master` and on every push to `master`, across a Node matrix of `[22, 24]` with `fail-fast: false`. In-progress runs are cancelled only for pull requests, never for `master`.
+`.github/workflows/ci.yml` runs `npm ci && npm run ci` on every pull request targeting, and every push to, `master` or `develop`, across a Node matrix of `[22, 24]` with `fail-fast: false`. In-progress runs are cancelled only for pull requests, never for `master`.
 
-**The workflow triggers do not yet match the [branching model](#branching).** It only watches `master`, so pull requests targeting `develop` — which is all of them — and pushes to `develop` get no CI run at all. Likewise `.github/dependabot.yml` sets no `target-branch`, so Dependabot opens its pull requests against the default branch rather than `develop`. Both need `develop` added.
+**Dependabot does not yet match the [branching model](#branching).** `.github/dependabot.yml` sets no `target-branch`, so Dependabot opens its pull requests against the default branch rather than `develop`.
 
 **A workflow alone does not block merges.** Making it mandatory requires branch protection on `master` in GitHub repo settings, marking `CI / Node 22` and `CI / Node 24` as required status checks. That is a repo setting, not a file in this repository.
 

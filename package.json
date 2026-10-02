@@ -1,7 +1,14 @@
 {
-  "name": "@ofzza/TSstd",
+  "name": "@ofzza/tsstd",
   "version": "0.0.1",
   "description": "TypeScript Standard library",
+  "keywords": [
+    "typescript",
+    "types",
+    "utility-types",
+    "type-assertions",
+    "type-testing"
+  ],
   "homepage": "https://github.com/ofzza/TSstd#readme",
   "bugs": {
     "url": "https://github.com/ofzza/TSstd/issues"
@@ -15,7 +22,20 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
   "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
+    "prebuild": "npm run clean",
     "build": "tsc",
     "dev": "tsc --watch",
     "ci": "npm-run-all ci:*",
@@ -25,7 +45,11 @@
     "ci:test-unit": "npm-run-all test:unit",
     "test": "npm-run-all test:*",
     "test:unit": "vitest run --passWithNoTests --project unit",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run ci"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "devDependencies": {
     "@eslint/compat": "^2.1.1",
