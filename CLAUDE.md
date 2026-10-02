@@ -40,6 +40,9 @@ src/
   assert/
     index.ts               Implementation
     index.test.ts          Tests, colocated
+  array/
+    index.ts               Array and tuple utility types
+    index.test.ts          Tests, colocated, asserting results with `src/assert`
 tsconfig.json              Build config. EXCLUDES *.test.ts / *.spec.ts
 tsconfig.test.json         Typecheck config. Includes everything, emits nothing
 vite.config.ts             Three Vitest projects: debug, unit, types
@@ -65,7 +68,7 @@ Vitest, with `describe`/`it`/`expect` imported explicitly (`globals` is not enab
 
 - **`unit`** — matches `src/**/*.{test,unit.test,spec,unit.spec}.{js,ts}`. It runs each test file through **both** Vitest pools in one invocation: the default pool executes it for its runtime expectations, and `tsc` (via `typecheck.tsconfig: './tsconfig.test.json'`) type checks it for its compile-time assertions, reporting type errors as failed tests.
 
-  `include` and `typecheck.include` deliberately match the same files. Vitest globs the two independently and does not warn when they overlap, so **every test file is collected and reported twice** — 33 tests show up as 66. That is expected, not a misconfiguration. Two consequences worth knowing: a file change triggers two reruns in watch mode, and a file containing no runtime `test()`/`describe()` call fails the runtime pass with "No test suite found in file" unless `--passWithNoTests` is set (it is, in `test:unit`).
+  `include` and `typecheck.include` deliberately match the same files. Vitest globs the two independently and does not warn when they overlap, so **every test file is collected and reported twice** — each test is counted once per pool. That is expected, not a misconfiguration. Two consequences worth knowing: a file change triggers two reruns in watch mode, and a file containing no runtime `test()`/`describe()` call fails the runtime pass with "No test suite found in file" unless `--passWithNoTests` is set (it is, in `test:unit`).
 
   Type errors in non-test sources are reported too — `tsc` runs over the whole `tsconfig.test.json` program with no file list, so an error outside a test file surfaces as an "Unhandled Source Error" and fails the run without being attributed to any test. `typecheck.ignoreSourceErrors` would suppress that; it is deliberately left at its default.
 
@@ -106,7 +109,9 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 - JSDoc on every exported symbol. One-line summary in imperative third person ("Gets ...", "Asserts ...", "Checks if ..."). Types get a prefix: `Utility type: ...`. Only `@param` and `@returns` are used anywhere in this codebase — no `@example`, `@template` or `@see`.
 - Internal, non-exported symbols are `_`-prefixed (`_IsIdentical`, `_IsAssignable`) and still get JSDoc. ESLint's `no-unused-vars` ignores `_`-prefixed vars, args and catch bindings.
 - Group sections with `// #region Name` / `// #endregion`.
-- Generic parameters are `T`-prefixed and descriptive (`TSchema`, `TModelName`) except in this library's assertion types, where the plain `A`/`B` reads better.
+- Generic parameters are `T`-prefixed and descriptive (`TArray`, `THead`, `TRest`), including `infer` bindings, which must never shadow an outer parameter. The exception is this library's assertion types, where the plain `A`/`B` reads better.
+- Utility types are named after the subject they operate on first: every array utility type starts with `Array` (`ArrayHead`, `ArrayTail`, `ArrayIsEmpty` — not `IsArrayEmpty`). Predicate types carry `Is` after that prefix and resolve to `true`, `false` or `boolean`. This differs from the `Assert*` types, which resolve to `true` or `never` so that consuming a failed one breaks compilation.
+- Array utility types take `TArray extends readonly unknown[]` so that `readonly` and `as const` tuples are accepted, match with `readonly [...]` patterns, and keep the naked `TArray` as the check type of their outermost conditional so they distribute over unions and map `never` to `never`.
 - `it()` names are capitalised verb phrases: `it('Holds for identical primitive types', ...)`.
 - Rules deliberately off: `@typescript-eslint/no-explicit-any`, `ban-ts-comment`, `no-empty-object-type`. `any` and `@ts-expect-error` are fine to use where they earn their place.
 
@@ -145,3 +150,9 @@ From `src/assert`, all compile-time assertion types resolving to `true` or `neve
 - `AssertTypeInequality<A, B>` — exact dual of the above.
 - `AssertTypeAssignable<A, B>` — a value of type `A` can be assigned to a variable of type `B`.
 - `AssertTypeUnassignable<A, B>` — exact dual of the above.
+
+From `src/array`, array and tuple utility types accepting mutable and `readonly` arrays, distributing over unions:
+
+- `ArrayIsEmpty<TArray>` — `true` for an empty tuple, `false` for a tuple with a required element, `boolean` when it may or may not be empty (`string[]`, `[1?]`).
+- `ArrayHead<TArray>` — type of the first element; `never` for `[]`, joined with `undefined` when the first element may not exist.
+- `ArrayTail<TArray>` — all elements but the first, preserving `readonly` and labels; `never` for `[]`. A leading-rest tuple's tail is widened to a plain array.

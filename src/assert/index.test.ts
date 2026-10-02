@@ -25,7 +25,7 @@ type ObjAOptional = { a?: string };
 type ObjAUndefinable = { a: string | undefined };
 
 describe('assert', () => {
-  describe('AssertTypeEquality', () => {
+  describe('AssertTypeEquality<A, B>', () => {
     it('Holds for identical primitive types', () => {
       expect(true satisfies AssertTypeEquality<string, string>).toBe(true);
       expect(true satisfies AssertTypeEquality<number, number>).toBe(true);
@@ -130,7 +130,7 @@ describe('assert', () => {
     });
   });
 
-  describe('AssertTypeInequality', () => {
+  describe('AssertTypeInequality<A, B>', () => {
     it('Holds for different primitive and literal types', () => {
       expect(true satisfies AssertTypeInequality<string, number>).toBe(true);
       expect(true satisfies AssertTypeInequality<null, undefined>).toBe(true);
@@ -181,7 +181,7 @@ describe('assert', () => {
     });
   });
 
-  describe('AssertTypeAssignable', () => {
+  describe('AssertTypeAssignable<A, B>', () => {
     it('Holds for a type assigned to itself', () => {
       expect(true satisfies AssertTypeAssignable<string, string>).toBe(true);
       expect(true satisfies AssertTypeAssignable<ObjA, ObjADuplicate>).toBe(true);
@@ -248,7 +248,7 @@ describe('assert', () => {
     });
   });
 
-  describe('AssertTypeUnassignable', () => {
+  describe('AssertTypeUnassignable<A, B>', () => {
     it('Holds for unrelated types', () => {
       expect(true satisfies AssertTypeUnassignable<string, number>).toBe(true);
       expect(true satisfies AssertTypeUnassignable<null, undefined>).toBe(true);
