@@ -30,13 +30,13 @@ Jump to section:
 To start using `TSstd` in your project, simply install it from NPM by running the following in your terminal:
 
 ```sh
-$ npm install @ofzza/TSstd --save
+$ npm install @ofzza/tsstd --save
 ```
 
 The library currently exports only types, which are erased at compile time and leave nothing behind in your bundle, so it can just as well be installed as a development dependency:
 
 ```sh
-$ npm install @ofzza/TSstd --save-dev
+$ npm install @ofzza/tsstd --save-dev
 ```
 
 # Type assertions
@@ -46,7 +46,7 @@ Assertions let you verify, at compile time, that a type is what you think it is.
 Every assertion resolves to `true` when it holds and to `never` when it doesn't. `never` is used as the failure value because nothing is assignable to `never` - so the moment you try to consume a failed assertion, compilation breaks at exactly the line that got it wrong:
 
 ```ts
-import type { AssertTypeEquality } from '@ofzza/TSstd';
+import type { AssertTypeEquality } from '@ofzza/tsstd';
 
 const stringIsString: AssertTypeEquality<string, string> = true; // This will work
 const stringIsNumber: AssertTypeEquality<string, number> = true; // This will fail at compile time
@@ -179,7 +179,7 @@ Write each assertion so it also registers as a regular expectation when the file
 
 ```ts
 import { describe, it, expect } from 'vitest';
-import type { AssertTypeEquality } from '@ofzza/TSstd';
+import type { AssertTypeEquality } from '@ofzza/tsstd';
 
 describe('Uppercase', () => {
   it('Uppercases a string literal type', () => {
@@ -208,7 +208,7 @@ Fixed length tuples resolve to exact answers. Plain arrays and tuples with optio
 Checks if an array type is empty. Resolves to `true` for an empty tuple, to `false` for a tuple with at least one required element, and to `boolean` for an array type which may or may not be empty:
 
 ```ts
-import type { AssertTypeEquality, ArrayIsEmpty } from '@ofzza/TSstd';
+import type { AssertTypeEquality, ArrayIsEmpty } from '@ofzza/tsstd';
 
 true satisfies AssertTypeEquality<ArrayIsEmpty<[]>, true>; // This will work
 true satisfies AssertTypeEquality<ArrayIsEmpty<readonly [1, 2]>, false>; // This will work
@@ -224,7 +224,7 @@ true satisfies AssertTypeEquality<ArrayIsEmpty<string[]>, false>; // This will f
 Gets the type of the first element of an array type, or `never` for an empty tuple. When the first element may not exist, its type is joined with `undefined`, which is what reading index `0` gives you at runtime:
 
 ```ts
-import type { AssertTypeEquality, ArrayHead } from '@ofzza/TSstd';
+import type { AssertTypeEquality, ArrayHead } from '@ofzza/tsstd';
 
 true satisfies AssertTypeEquality<ArrayHead<[1, 2, 3]>, 1>; // This will work
 true satisfies AssertTypeEquality<ArrayHead<readonly ['a', 'b']>, 'a'>; // This will work
@@ -242,7 +242,7 @@ Note that the head of `[never]` is `never` as well, and cannot be told apart fro
 Gets an array type of all the elements of an array type except the first one, or `never` for an empty tuple. The `readonly` modifier and element labels of the source array type are preserved:
 
 ```ts
-import type { AssertTypeEquality, ArrayTail } from '@ofzza/TSstd';
+import type { AssertTypeEquality, ArrayTail } from '@ofzza/tsstd';
 
 true satisfies AssertTypeEquality<ArrayTail<[1, 2, 3]>, [2, 3]>; // This will work
 true satisfies AssertTypeEquality<ArrayTail<readonly [1, 2, 3]>, readonly [2, 3]>; // This will work, `readonly` is preserved
@@ -269,7 +269,7 @@ Keys and values are resolved to tuples. **The order of their elements is unspeci
 Checks if an object type is empty. Resolves to `true` for an object type with no known keys, to `false` for an object type with at least one required property, and to `boolean` for an object type which may or may not be empty:
 
 ```ts
-import type { AssertTypeEquality, ObjectIsEmpty } from '@ofzza/TSstd';
+import type { AssertTypeEquality, ObjectIsEmpty } from '@ofzza/tsstd';
 
 true satisfies AssertTypeEquality<ObjectIsEmpty<{}>, true>; // This will work
 true satisfies AssertTypeEquality<ObjectIsEmpty<{ a: 1; b?: 2 }>, false>; // This will work, a single required property makes an object type non-empty
@@ -286,7 +286,7 @@ Note that `object` has no known keys either, and resolves to `true` just like `{
 Gets a tuple type of all the keys of an object type - string, number and symbol keys, of optional and `readonly` properties alike - in an unspecified order. An object type with no known keys resolves to an empty tuple:
 
 ```ts
-import type { AssertTypeEquality, ObjectKeys } from '@ofzza/TSstd';
+import type { AssertTypeEquality, ObjectKeys } from '@ofzza/tsstd';
 
 true satisfies AssertTypeEquality<ObjectKeys<{ a: 1 }>, ['a']>; // This will work
 true satisfies AssertTypeEquality<ObjectKeys<{ readonly a?: 1 }>, ['a']>; // This will work, property modifiers do not matter
@@ -304,7 +304,7 @@ Note that TypeScript reports the keys of a written out `string` index signature 
 Gets a tuple type of the types of all the properties of an object type, aligned with `ObjectKeys` - the value at any index belongs to the key at the same index. The type of an optional property is joined with `undefined`:
 
 ```ts
-import type { AssertTypeEquality, ObjectKeys, ObjectValues } from '@ofzza/TSstd';
+import type { AssertTypeEquality, ObjectKeys, ObjectValues } from '@ofzza/tsstd';
 
 type Point = { x: 'X'; y: 'Y' };
 
@@ -319,11 +319,11 @@ true satisfies AssertTypeEquality<ObjectValues<{ a?: 1 }>, [1]>; // This will fa
 
 # Development
 
-- `npm run build` - compiles `src/` to `dist/`, emitting declarations. Also run on `prepare`, so a local `npm install` builds too.
+- `npm run build` - cleans `dist/` (`npm run clean`), then compiles `src/` into it, emitting declarations. Also run on `prepare`, so a local `npm install` builds too.
 - `npm run dev` - the same, in watch mode.
 - `npm test` - runs every `test:*` script.
   - `npm run test:unit` - a single Vitest invocation that executes test files, runs their runtime expectations, and type checks them, reporting type errors as test failures.
-- `npm run ci` - runs every `ci:*` script: build, ESLint, Prettier and the tests. This is what GitHub Actions runs on every pull request targeting `master` and on every push to `master`, against Node 22 and 24.
+- `npm run ci` - runs every `ci:*` script: build, ESLint, Prettier and the tests. This is what GitHub Actions runs on every pull request targeting, and every push to, `master` or `develop`, against Node 22 and 24. It also runs on `prepublishOnly`, so `npm publish` refuses to publish a failing build.
 
 # Contributing
 
