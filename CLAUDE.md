@@ -43,6 +43,9 @@ src/
   array/
     index.ts               Array and tuple utility types
     index.test.ts          Tests, colocated, asserting results with `src/assert`
+  object/
+    index.ts               Object utility types
+    index.test.ts          Tests, colocated, asserting results with `src/assert`
 tsconfig.json              Build config. EXCLUDES *.test.ts / *.spec.ts
 tsconfig.test.json         Typecheck config. Includes everything, emits nothing
 vite.config.ts             Three Vitest projects: debug, unit, types
@@ -112,6 +115,7 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 - Generic parameters are `T`-prefixed and descriptive (`TArray`, `THead`, `TRest`), including `infer` bindings, which must never shadow an outer parameter. The exception is this library's assertion types, where the plain `A`/`B` reads better.
 - Utility types are named after the subject they operate on first: every array utility type starts with `Array` (`ArrayHead`, `ArrayTail`, `ArrayIsEmpty` — not `IsArrayEmpty`). Predicate types carry `Is` after that prefix and resolve to `true`, `false` or `boolean`. This differs from the `Assert*` types, which resolve to `true` or `never` so that consuming a failed one breaks compilation.
 - Array utility types take `TArray extends readonly unknown[]` so that `readonly` and `as const` tuples are accepted, match with `readonly [...]` patterns, and keep the naked `TArray` as the check type of their outermost conditional so they distribute over unions and map `never` to `never`.
+- Object utility types start with `Object` and take `TObject extends object`, keeping the naked `TObject` as the check type of their outermost conditional (`TObject extends unknown ? ... : never`) for the same distribution and `never` behaviour.
 - `it()` names are capitalised verb phrases: `it('Holds for identical primitive types', ...)`.
 - Rules deliberately off: `@typescript-eslint/no-explicit-any`, `ban-ts-comment`, `no-empty-object-type`. `any` and `@ts-expect-error` are fine to use where they earn their place.
 
@@ -126,6 +130,8 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 - **`@types/node` is pinned to the lowest supported Node major** (currently `^22`), so type checking cannot silently rely on APIs newer than the CI matrix floor. `.github/dependabot.yml` ignores its semver-major updates for this reason; bump it by hand together with the matrix.
 - **`@eslint/js` must be a direct devDependency.** `eslint.config.js` imports it, and since ESLint 10 it is no longer pulled in transitively by `eslint`.
 - **`tsconfig.json` excludes test files**, so `npm run build` will never report a type error in a test. Use `npm test` (the `unit` project type checks them) or `tsc --noEmit -p tsconfig.test.json`.
+- **The element order of `ObjectKeys` / `ObjectValues` is unspecified.** They turn the `keyof` union into a tuple, and TSC orders union members by internal type-creation order, not declaration order. Never assert an exact tuple for more than one key — assert `[number]`, `['length']` and per-index key/value alignment instead, as `src/object/index.test.ts` does.
+- **`keyof` of an index signature depends on how it is written:** `keyof { [key: string]: X }` is `string | number`, but `keyof Record<string, X>` is just `string`.
 - `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json`.
 - The recommended VS Code extension set includes `orta.vscode-twoslash-queries`, which powers the `// ^?` type-inspection comments used in sibling repos.
 - **Not yet adopted:** the sibling `ts-std` repo keeps a `src/readme.spec.ts` whose `describe`/`it` tree mirrors its README headings 1:1, turning documentation examples into executable tests. This repo has no equivalent — consider adding one if the README grows.
@@ -156,3 +162,9 @@ From `src/array`, array and tuple utility types accepting mutable and `readonly`
 - `ArrayIsEmpty<TArray>` — `true` for an empty tuple, `false` for a tuple with a required element, `boolean` when it may or may not be empty (`string[]`, `[1?]`).
 - `ArrayHead<TArray>` — type of the first element; `never` for `[]`, joined with `undefined` when the first element may not exist.
 - `ArrayTail<TArray>` — all elements but the first, preserving `readonly` and labels; `never` for `[]`. A leading-rest tuple's tail is widened to a plain array.
+
+From `src/object`, object utility types accepting any object type, distributing over unions:
+
+- `ObjectIsEmpty<TObject>` — `true` with no known keys (`{}`, `object`), `false` with a required property, `boolean` when it may or may not be empty (only optional properties, index signatures).
+- `ObjectKeys<TObject>` — tuple of all keys (string, number, symbol), in unspecified order; `[]` with no known keys.
+- `ObjectValues<TObject>` — tuple of property types, index-aligned with `ObjectKeys`; optional properties joined with `undefined`.
