@@ -2,7 +2,7 @@
 
 1. Search through the repository and delete unwanted files belonging to any of the following categories:
 
-- `*.ZoneIdentifier` in any directory or subdirectory within the project repo
+- `*:Zone.Identifier` in any directory or subdirectory within the project repo
 
 2. When done, output
 

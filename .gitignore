@@ -44,7 +44,7 @@ coverage.xml
 Thumbs.db
 Desktop.ini
 $RECYCLE.BIN/
-*.ZoneIdentifier
+*:Zone.Identifier
 .DS_Store
 
 # Explicitly omitted files
