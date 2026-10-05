@@ -8,14 +8,15 @@ Guidance for AI coding agents when working in this repository.
 
 Concrete triggers:
 
-| A change that ...                                         | ... requires updating                                                             |
-| --------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| adds, removes or renames an export                        | `README.md` API section, and [Exports](#exports) below                            |
-| changes an exported type's or function's semantics        | `README.md` API section and any example that demonstrates it                      |
-| adds or changes an npm script, Vitest project or tsconfig | [Commands](#commands) / [Testing](#testing), and `# Development` in `README.md`   |
-| adds a source directory under `src/`                      | [Layout](#layout) below                                                           |
-| establishes a new convention, or hits a new gotcha        | [Code style](#code-style) / [Gotchas and known issues](#gotchas-and-known-issues) |
-| resolves one of the known issues listed below             | remove it from [Gotchas and known issues](#gotchas-and-known-issues)              |
+| A change that ...                                               | ... requires updating                                                             |
+| --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| adds, removes or renames an export                              | `README.md` API section, and [Exports](#exports) below                            |
+| changes an exported type's or function's semantics              | `README.md` API section and any example that demonstrates it                      |
+| adds or changes an npm script, Vitest project or tsconfig       | [Commands](#commands) / [Testing](#testing), and `# Development` in `README.md`   |
+| changes the release process or `package.json` publishing fields | `PUBLISH.md`                                                                      |
+| adds a source directory under `src/`                            | [Layout](#layout) below                                                           |
+| establishes a new convention, or hits a new gotcha              | [Code style](#code-style) / [Gotchas and known issues](#gotchas-and-known-issues) |
+| resolves one of the known issues listed below                   | remove it from [Gotchas and known issues](#gotchas-and-known-issues)              |
 
 Any code sample added to `README.md` must be verified against `tsc` before being committed — see [Verifying README samples](#verifying-readme-samples).
 
@@ -51,6 +52,7 @@ tsconfig.json              Build config. EXCLUDES *.test.ts / *.spec.ts
 tsconfig.test.json         Typecheck config. Includes everything, emits nothing
 vite.config.ts             Two Vitest projects: debug, unit
 dist/                      Build output, gitignored
+PUBLISH.md                 Pre-publish checklist and release steps
 ```
 
 One directory per module under `src/`, each an `index.ts` + `index.test.ts` pair, re-exported from `src/index.ts`.
@@ -65,6 +67,8 @@ One directory per module under `src/`, each an `index.ts` + `index.test.ts` pair
 - `npm run ci` — runs every `ci:*` script: `ci:build`, `ci:eslint`, `ci:prettier`, `ci:test-unit`. This is what GitHub Actions runs.
 - `npm run prepare` — builds; invoked automatically by a local `npm install`/`npm ci` and before `npm publish`, but **not** when the package is installed as a dependency.
 - `prepublishOnly` — runs `npm run ci` before `npm publish`, so a failing build is never published.
+
+To release a version, follow [`PUBLISH.md`](./PUBLISH.md).
 
 **Script wiring matters when adding one.** `test` is `npm-run-all test:*` and `ci` is `npm-run-all ci:*`, so a new `test:<name>` joins `npm test` automatically — but it will _not_ run in CI until a matching `ci:test-<name>` script exists. Add both.
 
