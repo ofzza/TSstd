@@ -14,6 +14,7 @@ Concrete triggers:
 | changes an exported type's or function's semantics              | `README.md` API section and any example that demonstrates it                      |
 | adds or changes an npm script, Vitest project or tsconfig       | [Commands](#commands) / [Testing](#testing), and `# Development` in `README.md`   |
 | changes the release process or `package.json` publishing fields | `PUBLISH.md`                                                                      |
+| changes the branching model or contribution workflow            | [Branching](#branching) below, and `CONTRIBUTE.md`                                |
 | adds a source directory under `src/`                            | [Layout](#layout) below                                                           |
 | establishes a new convention, or hits a new gotcha              | [Code style](#code-style) / [Gotchas and known issues](#gotchas-and-known-issues) |
 | resolves one of the known issues listed below                   | remove it from [Gotchas and known issues](#gotchas-and-known-issues)              |
@@ -53,6 +54,7 @@ tsconfig.test.json         Typecheck config. Includes everything, emits nothing
 vite.config.ts             Two Vitest projects: debug, unit
 dist/                      Build output, gitignored
 PUBLISH.md                 Pre-publish checklist and release steps
+CONTRIBUTE.md              Contributor guide: reporting issues, workflow, branching
 ```
 
 One directory per module under `src/`, each an `index.ts` + `index.test.ts` pair, re-exported from `src/index.ts`.
