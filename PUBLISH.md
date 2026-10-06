@@ -64,7 +64,15 @@ $ node -e "import('@ofzza/tsstd').then(() => console.log('ok'))"
    $ npm publish
    ```
 
-5. **Verify the release** — `npm view @ofzza/tsstd version` prints the new version, and installing `@ofzza/tsstd@<version>` into a fresh project works.
+   A prerelease version (`x.y.z-alpha.n`, `-beta.n`, `-rc.n`) is rejected with "You must specify a tag using --tag when publishing a prerelease version". Publish it under its prerelease identifier, so that `latest` stays reserved for stable releases:
+
+   ```sh
+   $ npm publish --tag alpha
+   ```
+
+   Pass `--otp=<code>` as well if the account uses 2FA for publishing. `prepublishOnly` runs before the upload, so use a freshly generated code.
+
+5. **Verify the release** — `npm view @ofzza/tsstd version` prints the new version, and installing `@ofzza/tsstd@<version>` into a fresh project works. For a prerelease, check `npm view @ofzza/tsstd dist-tags` instead, since `version` follows `latest`. Right after a package's _first_ publish the registry may keep answering 404 for a while, because a 404 fetched before the publish stays cached; the tarball at `https://registry.npmjs.org/@ofzza/tsstd/-/tsstd-<version>.tgz` is available immediately and can be installed directly to verify.
 
 6. **Switch back to `develop`** to continue work:
 
