@@ -17,7 +17,7 @@ description: Publishes the package to NPM
 
 5. Publish to npm
 
-6. Report on success/failure of npm publish and if successful:
+6. Report on success/failure of npm publish, linking the published version's package page (`https://www.npmjs.com/package/@ofzza/tsstd/v/<version>`), and if successful:
 
 - Tag the current commit with the version number you just published as
 

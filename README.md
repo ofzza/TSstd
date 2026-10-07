@@ -1,5 +1,7 @@
 # TSstd
 
+[![npm](https://img.shields.io/npm/v/@ofzza/tsstd)](https://www.npmjs.com/package/@ofzza/tsstd)
+
 TypeScript standard library, implementing commonly used TypeScript types, utility types and related functionality.
 
 ---
@@ -27,7 +29,7 @@ Jump to section:
 
 # Get TSstd
 
-To start using `TSstd` in your project, simply install it from NPM by running the following in your terminal:
+To start using `TSstd` in your project, simply install it from [NPM](https://www.npmjs.com/package/@ofzza/tsstd) by running the following in your terminal:
 
 ```sh
 $ npm install @ofzza/tsstd --save
