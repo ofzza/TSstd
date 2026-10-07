@@ -23,7 +23,7 @@ Any code sample added to `README.md` must be verified against `tsc` before being
 
 ## Project
 
-TSstd — a TypeScript standard library of commonly used types, utility types and related functionality. MIT, published to NPM as **`@ofzza/tsstd`** (npm names must be lowercase; "TSstd" is only the display name), built from `src/` to `dist/`.
+TSstd — a TypeScript standard library of commonly used types, utility types and related functionality. MIT, published to [NPM](https://www.npmjs.com/package/@ofzza/tsstd) as **`@ofzza/tsstd`** (npm names must be lowercase; "TSstd" is only the display name), built from `src/` to `dist/`.
 
 - **ESM only** (`"type": "module"`). The entry point is the `exports` map (`.` → `types: ./dist/index.d.ts`, `default: ./dist/index.js`, plus `./package.json`); `main` and `types` mirror it for older tooling.
 - **Only `dist/` is published** (`files: ["dist"]`; npm adds `README.md`, `LICENSE` and `package.json` itself). `sideEffects: false`, and `publishConfig.access: public` because scoped packages otherwise publish as restricted.

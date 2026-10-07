@@ -1,6 +1,6 @@
 # Publishing
 
-How to release a new version of `@ofzza/tsstd` to NPM. Releases are cut from `develop` and published from `master`, following the branching model in [AGENTS.md](./AGENTS.md#branching).
+How to release a new version of [`@ofzza/tsstd`](https://www.npmjs.com/package/@ofzza/tsstd) to NPM. Releases are cut from `develop` and published from `master`, following the branching model in [AGENTS.md](./AGENTS.md#branching).
 
 ## Before each publish
 
@@ -72,7 +72,7 @@ $ node -e "import('@ofzza/tsstd').then(() => console.log('ok'))"
 
    Pass `--otp=<code>` as well if the account uses 2FA for publishing. `prepublishOnly` runs before the upload, so use a freshly generated code.
 
-5. **Verify the release** — `npm view @ofzza/tsstd version` prints the new version, and installing `@ofzza/tsstd@<version>` into a fresh project works. For a prerelease, check `npm view @ofzza/tsstd dist-tags` instead, since `version` follows `latest`. Right after a package's _first_ publish the registry may keep answering 404 for a while, because a 404 fetched before the publish stays cached; the tarball at `https://registry.npmjs.org/@ofzza/tsstd/-/tsstd-<version>.tgz` is available immediately and can be installed directly to verify.
+5. **Verify the release** — `npm view @ofzza/tsstd version` prints the new version, installing `@ofzza/tsstd@<version>` into a fresh project works, and the [package page](https://www.npmjs.com/package/@ofzza/tsstd) shows it. For a prerelease, check `npm view @ofzza/tsstd dist-tags` instead, since `version` follows `latest`. Right after a package's _first_ publish the registry may keep answering 404 for a while, because a 404 fetched before the publish stays cached; the tarball at `https://registry.npmjs.org/@ofzza/tsstd/-/tsstd-<version>.tgz` is available immediately and can be installed directly to verify.
 
 6. **Switch back to `develop`** to continue work:
 
