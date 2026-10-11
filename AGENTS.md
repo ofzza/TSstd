@@ -53,6 +53,7 @@ tsconfig.json              Build config. EXCLUDES *.test.ts / *.spec.ts
 tsconfig.test.json         Typecheck config. Includes everything, emits nothing
 vite.config.ts             Two Vitest projects: debug, unit
 dist/                      Build output, gitignored
+.vscode/extensions.json    Recommended VSCode extensions: ESLint, Prettier, Twoslash Query Comments
 PUBLISH.md                 Pre-publish checklist and release steps
 CONTRIBUTE.md              Contributor guide: reporting issues, workflow, branching
 ```
@@ -86,7 +87,7 @@ Vitest, with `describe`/`it`/`expect` imported explicitly (`globals` is not enab
 
   `typecheck.spawnTimeout` is pinned to `10000` because Vitest 5.0.1 documents a `10_000` default for it but never applies one, yet consumes it unguarded when spawning the checker, which leaves an intermittent race.
 
-- **`debug`** — `include: ['src/**/*.{debug}.{js,ts}']`, i.e. files ending in `.debug.ts` / `.debug.js`. Intended to be driven by a local "debug current test file" launch config; no `.vscode/` files are currently committed. Separately, `.gitignore` excludes `*.debug.test.ts` — those match the `unit` glob, so scratch debug tests run locally but are never committed.
+- **`debug`** — `include: ['src/**/*.{test,unit.test,spec,unit.spec,debug,debug.test}.{js,ts}']`, i.e. every file the `unit` project runs plus files ending in `.debug.ts` / `.debug.js`. It executes them at runtime only, with no type checking. Intended to be driven by a local "debug current test file" launch config; no `.vscode/launch.json` is currently committed. Separately, `.gitignore` excludes `*.debug.test.ts` — those match the `unit` glob, so scratch debug tests run locally but are never committed.
 
 `tsconfig.test.json` exists because `tsconfig.json` excludes `*.test.ts` from the build — without it nothing would ever type check the test files, and compile-time assertions in them would be silently inert.
 
@@ -145,7 +146,7 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 - **`tsconfig.json` excludes test files**, so `npm run build` will never report a type error in a test. Use `npm test` (the `unit` project type checks them) or `tsc --noEmit -p tsconfig.test.json`.
 - **The element order of `ObjectKeys` / `ObjectValues` is unspecified.** They turn the `keyof` union into a tuple, and TSC orders union members by internal type-creation order, not declaration order. Never assert an exact tuple for more than one key — assert `[number]`, `['length']` and per-index key/value alignment instead, as `src/object/index.test.ts` does.
 - **`keyof` of an index signature depends on how it is written:** `keyof { [key: string]: X }` is `string | number`, but `keyof Record<string, X>` is just `string`.
-- `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json` — none of which are currently committed.
+- `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json`. Only `extensions.json` is currently committed; any other `.vscode/` file must be re-included there before it can be.
 - **Not yet adopted:** the sibling `ts-std` repo keeps a `src/readme.spec.ts` whose `describe`/`it` tree mirrors its README headings 1:1, turning documentation examples into executable tests. This repo has no equivalent — consider adding one if the README grows.
 
 ## Continuous integration
