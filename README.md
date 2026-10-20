@@ -321,7 +321,7 @@ true satisfies AssertTypeEquality<ObjectValues<{ a?: 1 }>, [1]>; // This will fa
 
 # Development
 
-- `npm run build` - cleans `dist/` (`npm run clean`), then compiles `src/` into it, emitting declarations. Also run on `prepare`, so a local `npm install` builds too.
+- `npm run build` - cleans `dist/` (`npm run clean`), then compiles `src/` into it with `tsconfig.build.json`, emitting declarations. A bare `tsc` only type checks, tests included, and emits nothing. Also run on `prepare`, so a local `npm install` builds too.
 - `npm run dev` - the same, in watch mode.
 - `npm test` - runs every `test:*` script.
   - `npm run test:unit` - a single Vitest invocation that executes runtime test files (`*.test.ts`) and type checks both those and type-only test files (`*.test-d.ts`), reporting type errors as test failures. All current tests are type-only.

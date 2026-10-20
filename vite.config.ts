@@ -31,7 +31,7 @@ export default defineConfig({
             enabled: true,
             include: ['src/**/*.{test,unit.test,spec,unit.spec,test-d,spec-d}.{ts,tsx}'],
             exclude: ['node_modules/**', 'dist/**'],
-            tsconfig: './tsconfig.test.json',
+            tsconfig: './tsconfig.json',
             // Vitest 5.0.1 documents, but does not apply, a default for this, but consumes it unguarded when spawning the checker
             spawnTimeout: 10000,
           },
