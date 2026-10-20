@@ -175,9 +175,9 @@ The row that catches most hand-written equality checks is `{ a: string }` vs `{ 
 
 ## Writing type level tests
 
-Assertions are checked by the compiler, not at runtime, so a test file full of them only earns its keep if something actually type checks it. In this repository test files are run through both Vitest pools in a single `npm test`: executed as ordinary tests, and type checked with `tsc`, which reports type errors as test failures.
+Assertions are checked by the compiler, not at runtime, so a test file full of them only earns its keep if something actually type checks it. With Vitest, that means enabling [`typecheck`](https://vitest.dev/guide/testing-types), which runs `tsc` over your test files and reports type errors as test failures. In this repository every test is a type-only `*.test-d.ts` file, which Vitest only type checks and never executes.
 
-Write each assertion so it also registers as a regular expectation when the file is executed, and mark the cases you expect to fail with `@ts-expect-error`:
+Wrap each assertion in an `expect()`, so the same line works in a type-only file and also registers as a regular expectation in a test file that is executed, and mark the cases you expect to fail with `@ts-expect-error`:
 
 ```ts
 import { describe, it, expect } from 'vitest';
@@ -195,7 +195,7 @@ describe('Uppercase', () => {
 
 An unused `@ts-expect-error` is itself a compile error, so this catches regressions in both directions: an assertion that starts failing breaks the build, and so does one that was supposed to fail and no longer does.
 
-See `src/assert/index.test.ts` for the full suite written this way.
+See `src/assert/index.test-d.ts` for the full suite written this way.
 
 # Arrays
 
@@ -324,7 +324,7 @@ true satisfies AssertTypeEquality<ObjectValues<{ a?: 1 }>, [1]>; // This will fa
 - `npm run build` - cleans `dist/` (`npm run clean`), then compiles `src/` into it, emitting declarations. Also run on `prepare`, so a local `npm install` builds too.
 - `npm run dev` - the same, in watch mode.
 - `npm test` - runs every `test:*` script.
-  - `npm run test:unit` - a single Vitest invocation that executes test files, runs their runtime expectations, and type checks them, reporting type errors as test failures.
+  - `npm run test:unit` - a single Vitest invocation that executes runtime test files (`*.test.ts`) and type checks both those and type-only test files (`*.test-d.ts`), reporting type errors as test failures. All current tests are type-only.
 - `npm run ci` - runs every `ci:*` script: build, ESLint, Prettier and the tests. This is what GitHub Actions runs on every pull request targeting, and every push to, `master` or `develop`, against Node 22 and 24. It also runs on `prepublishOnly`, so `npm publish` refuses to publish a failing build.
 
 # Contributing

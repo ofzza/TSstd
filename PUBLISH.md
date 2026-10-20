@@ -8,7 +8,7 @@ How to release a new version of [`@ofzza/tsstd`](https://www.npmjs.com/package/@
 - [ ] **CI is green** for the head of `develop` on GitHub, on both `CI / Node 22` and `CI / Node 24`.
 - [ ] **`npm run ci` passes locally** — build, ESLint, Prettier and the unit tests, including type checks.
 - [ ] **The documentation matches the code** — the `README.md` API section and the [Exports](./AGENTS.md#exports) list in `AGENTS.md` cover everything re-exported from `src/index.ts`, and the `README.md` samples have been checked against `tsc` (see [Verifying README samples](./AGENTS.md#verifying-readme-samples)).
-- [ ] **The package contents are right** — `npm pack --dry-run` lists only `dist/`, `README.md`, `LICENSE` and `package.json`, with no `*.test.*` files under `dist/`.
+- [ ] **The package contents are right** — `npm pack --dry-run` lists only `dist/`, `README.md`, `LICENSE` and `package.json`, with no `*.test.*` / `*.test-d.*` files under `dist/`.
 - [ ] **The packed tarball works for a consumer** — see [Consumer smoke test](#consumer-smoke-test) below.
 - [ ] **`package.json` still has no `dependencies`**, as long as the library is types-only.
 - [ ] **If this release adds the first runtime export**, re-read [Gotchas and known issues](./AGENTS.md#gotchas-and-known-issues), since several of them assume a types-only package (`sideEffects`, `dependencies`, `--save-dev` in `README.md`).

@@ -42,23 +42,24 @@ src/
   index.ts                 Barrel, re-exports every module: `export * from './assert/index.js';`
   assert/
     index.ts               Implementation
-    index.test.ts          Tests, colocated
+    index.test-d.ts        Type-only tests, colocated
   array/
     index.ts               Array and tuple utility types
-    index.test.ts          Tests, colocated, asserting results with `src/assert`
+    index.test-d.ts        Type-only tests, colocated, asserting results with `src/assert`
   object/
     index.ts               Object utility types
-    index.test.ts          Tests, colocated, asserting results with `src/assert`
-tsconfig.json              Build config. EXCLUDES *.test.ts / *.spec.ts
-tsconfig.test.json         Typecheck config. Includes everything, emits nothing
-vite.config.ts             Two Vitest projects: debug, unit
+    index.test-d.ts        Type-only tests, colocated, asserting results with `src/assert`
+tsconfig.json              Build config. EXCLUDES test files (*.test / *.spec / *.test-d / *.spec-d)
+tsconfig.test.json         Typecheck config. Includes all .ts/.tsx (tests too), emits nothing
+vite.config.ts             Two Vitest projects: unit, and debug (only with VITEST_DEBUG=1)
 dist/                      Build output, gitignored
 .vscode/extensions.json    Recommended VSCode extensions: ESLint, Prettier, Twoslash Query Comments
+.vscode/launch.json        Debug configs: all test files, unit test files, current test file (debug project)
 PUBLISH.md                 Pre-publish checklist and release steps
 CONTRIBUTE.md              Contributor guide: reporting issues, workflow, branching
 ```
 
-One directory per module under `src/`, each an `index.ts` + `index.test.ts` pair, re-exported from `src/index.ts`.
+One directory per module under `src/`, each an `index.ts` + `index.test-d.ts` pair, re-exported from `src/index.ts`.
 
 ## Commands
 
@@ -66,7 +67,7 @@ One directory per module under `src/`, each an `index.ts` + `index.test.ts` pair
 - `npm run build` — `tsc`, compiles `src/` to `dist/` with declarations. `prebuild` runs `clean` first, so renamed or removed modules never leave stale output behind to be published.
 - `npm run dev` — the same in watch mode.
 - `npm test` — runs every `test:*` script.
-  - `npm run test:unit` — `vitest run --project unit`, a single invocation that both executes tests and type checks them.
+  - `npm run test:unit` — `vitest run --project unit`, a single invocation that both executes runtime tests and type checks test files.
 - `npm run ci` — runs every `ci:*` script: `ci:build`, `ci:eslint`, `ci:prettier`, `ci:test-unit`. This is what GitHub Actions runs.
 - `npm run prepare` — builds; invoked automatically by a local `npm install`/`npm ci` and before `npm publish`, but **not** when the package is installed as a dependency.
 - `prepublishOnly` — runs `npm run ci` before `npm publish`, so a failing build is never published.
@@ -79,17 +80,29 @@ To release a version, follow [`PUBLISH.md`](./PUBLISH.md).
 
 Vitest, with `describe`/`it`/`expect` imported explicitly (`globals` is not enabled). Two projects in `vite.config.ts`:
 
-- **`unit`** — matches `src/**/*.{test,unit.test,spec,unit.spec}.{js,ts}`. It runs each test file through **both** Vitest pools in one invocation: the default pool executes it for its runtime expectations, and `tsc` (via `typecheck.tsconfig: './tsconfig.test.json'`) type checks it for its compile-time assertions, reporting type errors as failed tests.
+- **`unit`** — matches `src/**/*.{test,unit.test,spec,unit.spec}.{js,jsx,ts,tsx}`. It runs each TypeScript test file through **both** Vitest pools in one invocation: the default pool executes it for its runtime expectations, and `tsc` (via `typecheck.tsconfig: './tsconfig.test.json'`) type checks it for its compile-time assertions, reporting type errors as failed tests.
 
-  `include` and `typecheck.include` deliberately match the same files. Vitest globs the two independently and does not warn when they overlap, so **every test file is collected and reported twice** — each test is counted once per pool. That is expected, not a misconfiguration. Two consequences worth knowing: a file change triggers two reruns in watch mode, and a file containing no runtime `test()`/`describe()` call fails the runtime pass with "No test suite found in file" unless `--passWithNoTests` is set (it is, in `test:unit`).
+  Two kinds of file only go through one pool. JavaScript test files (`.js`, `.jsx`) are only executed, as `tsc` does not check JavaScript. Type-only test files, Vitest's `*.test-d.{ts,tsx}` / `*.spec-d.{ts,tsx}` convention, are only type checked. **Every test in this repository is a type-only `*.test-d.ts` file**, as the library has no runtime code to execute — so the runtime pass currently finds no files at all, and `test:unit` relies on `--passWithNoTests` for that. A future runtime export gets a regular `*.test.ts` file next to its `*.test-d.ts`.
+
+  `tsc` only checks files `tsconfig.test.json` includes, whatever `typecheck.include` says. A test file outside its `include` is collected but never checked, so its type assertions pass silently. This is why `tsconfig.test.json` includes `.tsx` files.
+
+  `include` and `typecheck.include` deliberately match the same regular (non `-d`) TypeScript test files. Vitest globs the two independently and does not warn when they overlap, so **every such test file is collected and reported twice** — each test is counted once per pool. That is expected, not a misconfiguration. Two consequences worth knowing: a file change triggers two reruns in watch mode, and a file containing no runtime `test()`/`describe()` call fails the runtime pass with "No test suite found in file" unless `--passWithNoTests` is set (it is, in `test:unit`).
 
   Type errors in non-test sources are reported too — `tsc` runs over the whole `tsconfig.test.json` program with no file list, so an error outside a test file surfaces as an "Unhandled Source Error" and fails the run without being attributed to any test. `typecheck.ignoreSourceErrors` would suppress that; it is deliberately left at its default.
 
   `typecheck.spawnTimeout` is pinned to `10000` because Vitest 5.0.1 documents a `10_000` default for it but never applies one, yet consumes it unguarded when spawning the checker, which leaves an intermittent race.
 
-- **`debug`** — `include: ['src/**/*.{test,unit.test,spec,unit.spec,debug,debug.test}.{js,ts}']`, i.e. every file the `unit` project runs plus files ending in `.debug.ts` / `.debug.js`. It executes them at runtime only, with no type checking. Intended to be driven by a local "debug current test file" launch config; no `.vscode/launch.json` is currently committed. Separately, `.gitignore` excludes `*.debug.test.ts` — those match the `unit` glob, so scratch debug tests run locally but are never committed.
+- **`debug`** — matches every file the `unit` project executes, plus files ending in `.debug.{js,jsx,ts,tsx}`. Type-only `*.test-d.*` files are not in it, as there is nothing in them to execute — so until the library has runtime code, it has nothing to run and fails with "No test files found". It executes files at runtime only, with no type checking, and is driven by the "Debug Current Test File" config in `.vscode/launch.json`.
 
-`tsconfig.test.json` exists because `tsconfig.json` excludes `*.test.ts` from the build — without it nothing would ever type check the test files, and compile-time assertions in them would be silently inert.
+  It is **only defined when `VITEST_DEBUG=1` is set**, so an unfiltered run (plain `vitest`, "Debug ALL Test Files", or a tool that runs every project it finds) does not run every test a second time. "Debug Current Test File" sets the variable through its `env`. From a terminal, set it yourself, e.g. `$ VITEST_DEBUG=1 npx vitest run --project debug src/<module>/index.test.ts`. Without it, `--project debug` fails with "No projects were found". There is deliberately no npm script for this: setting a variable inline is not portable to Windows, and a `test:debug` script would join `npm test`.
+
+  `.gitignore` excludes `*.debug.test.{js,jsx,ts,tsx}`. Those files also match the `unit` glob, so scratch debug tests run locally but are never committed.
+
+Vitest's reporter is `tree`, listing every test under its `describe` blocks.
+
+**`.tsx` / `.jsx` files are supported, but JSX in them is not configured.** This is kept only for compatibility with the `.templates/ts` project template this repository is based on. They are collected, linted, type checked and built like any other file. An actual JSX element, though, fails at runtime (Vite's default transform imports `react/jsx-dev-runtime`) and under `tsc` (no `jsx` compiler option).
+
+`tsconfig.test.json` exists because `tsconfig.json` excludes test files from the build — without it nothing would ever type check the test files, and compile-time assertions in them would be silently inert.
 
 ### Type level assertions
 
@@ -97,7 +110,7 @@ Vitest, with `describe`/`it`/`expect` imported explicitly (`globals` is not enab
 
 **Consume an assertion by assigning `true` to it — never through a generic constraint.** `never` is assignable to everything, so `never extends true` is `true` and a constraint like `<T extends true>` is satisfied by a _failing_ assertion exactly as happily as by a passing one. Assigning a value is the only sound discriminator, because nothing is assignable to `never`.
 
-The idiom used throughout the test suite gives a compile-time check in the `types` project and a runtime expectation in the `unit` project from one line:
+The idiom used throughout the test suite wraps each assertion in an `expect()`. In a type-only `*.test-d.ts` file it is never executed, so only the compile-time check in the `unit` project's typecheck pass matters; the wrapper is kept so assertions are written the same way as they would be in a regular, executed test file:
 
 ```ts
 expect(true satisfies AssertTypeEquality<string, string>).toBe(true);
@@ -143,10 +156,11 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 - **`package.json` has no `dependencies`, and must stay that way while the library is types-only.** Anything listed there is installed for every consumer. `@types/node` in particular is a devDependency, needed only by `eslint.config.js` — nothing in `src/` uses Node APIs.
 - **`@types/node` is pinned to the lowest supported Node major** (currently `^22`), so type checking cannot silently rely on APIs newer than the CI matrix floor. `.github/dependabot.yml` ignores its semver-major updates for this reason; bump it by hand together with the matrix.
 - **`@eslint/js` must be a direct devDependency.** `eslint.config.js` imports it, and since ESLint 10 it is no longer pulled in transitively by `eslint`.
-- **`tsconfig.json` excludes test files**, so `npm run build` will never report a type error in a test. Use `npm test` (the `unit` project type checks them) or `tsc --noEmit -p tsconfig.test.json`.
-- **The element order of `ObjectKeys` / `ObjectValues` is unspecified.** They turn the `keyof` union into a tuple, and TSC orders union members by internal type-creation order, not declaration order. Never assert an exact tuple for more than one key — assert `[number]`, `['length']` and per-index key/value alignment instead, as `src/object/index.test.ts` does.
+- **`tsconfig.json` excludes test files**, so `npm run build` will never report a type error in a test, and never emits one to `dist/`. Its `exclude` lists each test suffix (`.test`, `.spec`, `.test-d`, `.spec-d`) for both `.ts` and `.tsx`, as tsconfig globs have no `{a,b}` braces. A new test naming convention must be added there, or its files ship in the package. Use `npm test` (the `unit` project type checks them) or `tsc --noEmit -p tsconfig.test.json`.
+- **The element order of `ObjectKeys` / `ObjectValues` is unspecified.** They turn the `keyof` union into a tuple, and TSC orders union members by internal type-creation order, not declaration order. Never assert an exact tuple for more than one key — assert `[number]`, `['length']` and per-index key/value alignment instead, as `src/object/index.test-d.ts` does.
 - **`keyof` of an index signature depends on how it is written:** `keyof { [key: string]: X }` is `string | number`, but `keyof Record<string, X>` is just `string`.
-- `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json`. Only `extensions.json` is currently committed; any other `.vscode/` file must be re-included there before it can be.
+- **ESLint's typed-linting block sets `tsconfigRootDir: import.meta.dirname`**, the directory `project: './tsconfig.test.json'` is resolved against. Left unset, typescript-eslint 8 infers it: reading `ts.configs.*` records the calling config file's directory as a candidate, falling back to `process.cwd()` with no candidate and throwing "multiple candidate TSConfigRootDirs" with more than one (e.g. an editor loading several workspace configs in one process). Setting it explicitly makes linting independent of that heuristic and of the working directory.
+- `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json`. Only `extensions.json` and `launch.json` are currently committed; any other `.vscode/` file must be re-included there before it can be.
 - **Not yet adopted:** the sibling `ts-std` repo keeps a `src/readme.spec.ts` whose `describe`/`it` tree mirrors its README headings 1:1, turning documentation examples into executable tests. This repo has no equivalent — consider adding one if the README grows.
 
 ## Continuous integration

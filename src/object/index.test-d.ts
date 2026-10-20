@@ -3,10 +3,10 @@ import type { AssertTypeEquality, AssertTypeAssignable } from '../assert/index';
 import type { ObjectIsEmpty, ObjectKeys, ObjectValues } from './index';
 
 /**
- * Every utility type is tested by asserting its result with `AssertTypeEquality`, which resolves to `true` when it holds and to `never` when it
- * doesn't, so `true satisfies <assertion>` compiles only while the assertion holds. The assertions are therefore checked by TSC (the `types`
- * vitest project), while the `expect()` wrapping them only makes each one show up as a regular expectation when the same file is executed by the
- * `unit` vitest project.
+ * Every utility type is tested by asserting its result with `AssertTypeEquality`, which resolves to `true` when it holds and to `never` when it doesn't, so
+ * `true satisfies <assertion>` compiles only while the assertion holds. The assertions are therefore checked by TSC (the `unit` vitest project's typecheck
+ * pass, which is the only pass a `*.test-d.ts` file goes through). The `expect()` wrapping them is never executed; it is kept so that assertions are written
+ * the same way here as in a regular, executed test file.
  *
  * Results that are expected not to hold are marked with `@ts-expect-error`, which TSC reports as an error of its own when unused - so both a
  * correct result that starts being wrong and a wrong result that starts being reported as correct break the build.
