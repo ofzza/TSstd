@@ -2,6 +2,8 @@
 
 How to release a new version of [`@ofzza/tsstd`](https://www.npmjs.com/package/@ofzza/tsstd) to NPM. Releases are cut from `develop` and published from `master`, following the branching model in [AGENTS.md](./AGENTS.md#branching).
 
+An agent following these steps asks before each commit, tag, push, merge and publish, one at a time (see [WORKFLOW.md](./WORKFLOW.md) › "Outward actions").
+
 ## Before each publish
 
 - [ ] **`develop` is clean and in sync with `origin`** — `git status` shows nothing to commit, and `git pull` brings in nothing new.

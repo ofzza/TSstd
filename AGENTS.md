@@ -2,22 +2,33 @@
 
 Guidance for AI coding agents when working in this repository.
 
-## Keeping this file and README.md current
+## Keeping documentation and tests current
 
-**`AGENTS.md` and `README.md` are part of the deliverable of every task, not separate chores.** Whenever a change makes something here or in the README inaccurate, update it in the same change — never leave it for later, and never finish a task reporting only the code change.
+Documentation and tests are part of the deliverable of every task, as [WORKFLOW.md](./WORKFLOW.md) › "Documentation and tests" describes. This section says which ones a change touches. `PUBLISH.md` falls under the same rule whenever the release process changes.
+
+- **`README.md`** is the user-facing documentation: what the library is, how to get it, every export, and how to develop it (`# Development`).
+- **`CONTRIBUTE.md`** is the contributor-facing documentation: reporting issues, the contribution workflow and branching, and the architecture and glossary.
+- **`AGENTS.md`** (this file, included by `CLAUDE.md`) is the agent-facing documentation: layout, commands, testing, conventions and gotchas.
+
+New or changed behaviour gets tests in the `*.test-d.ts` (or, for runtime code, `*.test.ts`) beside the changed file. The purpose comments of the tests (see [Code style](#code-style)) are part of them, and must be kept current along with them.
 
 Concrete triggers:
 
-| A change that ...                                               | ... requires updating                                                             |
-| --------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| adds, removes or renames an export                              | `README.md` API section, and [Exports](#exports) below                            |
-| changes an exported type's or function's semantics              | `README.md` API section and any example that demonstrates it                      |
-| adds or changes an npm script, Vitest project or tsconfig       | [Commands](#commands) / [Testing](#testing), and `# Development` in `README.md`   |
-| changes the release process or `package.json` publishing fields | `PUBLISH.md`                                                                      |
-| changes the branching model or contribution workflow            | [Branching](#branching) below, and `CONTRIBUTE.md`                                |
-| adds a source directory under `src/`                            | [Layout](#layout) below                                                           |
-| establishes a new convention, or hits a new gotcha              | [Code style](#code-style) / [Gotchas and known issues](#gotchas-and-known-issues) |
-| resolves one of the known issues listed below                   | remove it from [Gotchas and known issues](#gotchas-and-known-issues)              |
+| A change that ...                                               | ... requires updating                                                                |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| changes behaviour or code                                       | the `*.test-d.ts` / `*.test.ts` beside it                                            |
+| adds, changes or removes a test                                 | the purpose comment of its `describe`, and of the `it` if it has one                 |
+| adds, removes or renames an export                              | `README.md` API section, and [Exports](#exports) below                               |
+| changes an exported type's or function's semantics              | `README.md` API section and any example that demonstrates it                         |
+| adds or changes an npm script, Vitest project or tsconfig       | [Commands](#commands) / [Testing](#testing), and `# Development` in `README.md`      |
+| changes the release process or `package.json` publishing fields | `PUBLISH.md`                                                                         |
+| changes the branching model or contribution workflow            | [Branching](#branching) below, and `CONTRIBUTE.md`                                   |
+| adds a source directory under `src/`                            | [Layout](#layout) below, and the project structure in `CONTRIBUTE.md`                |
+| introduces, renames or retires a concept or term                | the glossary in `CONTRIBUTE.md`, and every identifier, comment and document using it |
+| establishes a new convention, or hits a new gotcha              | [Code style](#code-style) / [Gotchas and known issues](#gotchas-and-known-issues)    |
+| resolves one of the known issues listed below                   | remove it from [Gotchas and known issues](#gotchas-and-known-issues)                 |
+
+New Glossary terms are proposed, and existing ones renamed or retired only when asked, as [WORKFLOW.md](./WORKFLOW.md) › "Glossary" describes.
 
 Any code sample added to `README.md` must be verified against `tsc` before being committed — see [Verifying README samples](#verifying-readme-samples).
 
@@ -28,12 +39,21 @@ TSstd — a TypeScript standard library of commonly used types, utility types an
 - **ESM only** (`"type": "module"`). The entry point is the `exports` map (`.` → `types: ./dist/index.d.ts`, `default: ./dist/index.js`, plus `./package.json`); `main` and `types` mirror it for older tooling.
 - **Only `dist/` is published** (`files: ["dist"]`; npm adds `README.md`, `LICENSE` and `package.json` itself). `sideEffects: false`, and `publishConfig.access: public` because scoped packages otherwise publish as restricted.
 - **Currently types-only.** Nothing in `src/` emits runtime code, so `dist/assert/index.js` is just `export {}`. The first runtime export will change assumptions in several places — re-read [Gotchas](#gotchas-and-known-issues) when adding one.
-- Toolchain last verified against: Node 24.15, npm 11.12, TypeScript 5.9.3, Vitest 5.0.1.
+- Toolchain last verified against: Node 24.15, npm 11.12, TypeScript 5.9.3, Vitest 5.1.0, ESLint 10.11, Prettier 3.9.
 
 ## Branching
 
+- **Commit to the current branch by default.** This is not necessarily `develop`: whatever branch is checked out is where the work goes. Do not create a feature branch unless the user asks for one.
+- **Never commit to `master`, or onto a detached HEAD.** If the current branch is `master` (or there is none), stop and ask the user where the work should go: normally `develop` or a new feature branch.
+- **Propose a feature branch when a change warrants one.** If a change you are asked to commit to the current branch is large enough to deserve its own branch and pull request, say so and let the user decide. Do not branch on your own.
+- **Feature branches** are named after the work, e.g. `feature/<short-topic>` or `fix/<short-topic>`. When work on a feature branch is committed and pushed, **PROPOSE** opening a pull request into `develop` (see [WORKFLOW.md](./WORKFLOW.md) › "Outward actions").
 - **`develop` is the work-in-progress trunk.** Create every feature, fix or dependency branch from `develop`, and open every pull request against `develop`.
 - **`master` holds only the latest stable release.** It is never committed to directly and never receives feature pull requests — it is only updated by merging `develop` into it when a stable version is released.
+
+## Commits
+
+- Commit messages have an imperative summary line, and explain _why_ in the body when it is not obvious from the change.
+- **No AI attribution**, anywhere: see [WORKFLOW.md](./WORKFLOW.md) › "No AI attribution", a hard rule.
 
 ## Layout
 
@@ -52,11 +72,16 @@ src/
 tsconfig.json              Type checking config. Includes all .ts/.tsx (tests too), emits nothing
 tsconfig.build.json        Build config. Extends tsconfig.json, emits to dist/ with declarations, EXCLUDES test files (*.test / *.spec / *.test-d / *.spec-d)
 vite.config.ts             Two Vitest projects: unit, and debug (only with VITEST_DEBUG=1)
+eslint.config.js           ESLint flat config (typescript-eslint + prettier compat, ignores what .gitignore ignores)
+.prettierrc                Prettier config
 dist/                      Build output, gitignored
-.vscode/extensions.json    Recommended VSCode extensions: ESLint, Prettier, Twoslash Query Comments
+.github/workflows/ci.yml   GitHub Actions CI
+.github/dependabot.yml     Weekly dependency updates
+.vscode/extensions.json    Recommended VSCode extensions: ESLint, Prettier, TODO Highlight, Twoslash Query Comments
 .vscode/launch.json        Debug configs: all test files, unit test files, current test file (debug project)
+README.md                  User documentation
 PUBLISH.md                 Pre-publish checklist and release steps
-CONTRIBUTE.md              Contributor guide: reporting issues, workflow, branching
+CONTRIBUTE.md              Contributor guide: reporting issues, workflow, branching, architecture and glossary
 ```
 
 One directory per module under `src/`, each an `index.ts` + `index.test-d.ts` pair, re-exported from `src/index.ts`.
@@ -90,7 +115,7 @@ Vitest, with `describe`/`it`/`expect` imported explicitly (`globals` is not enab
 
   Type errors in non-test sources are reported too — `tsc` runs over the whole `tsconfig.json` program with no file list, so an error outside a test file surfaces as an "Unhandled Source Error" and fails the run without being attributed to any test. `typecheck.ignoreSourceErrors` would suppress that; it is deliberately left at its default.
 
-  `typecheck.spawnTimeout` is pinned to `10000` because Vitest 5.0.1 documents a `10_000` default for it but never applies one, yet consumes it unguarded when spawning the checker, which leaves an intermittent race.
+  `typecheck.spawnTimeout` is pinned to `10000` because Vitest 5 (checked up to 5.1.0) documents a `10_000` default for it but never applies one, yet consumes it unguarded when spawning the checker, which leaves an intermittent race.
 
 - **`debug`** — matches every file the `unit` project executes, plus files ending in `.debug.{js,jsx,ts,tsx}`. Type-only `*.test-d.*` files are not in it, as there is nothing in them to execute — so until the library has runtime code, it has nothing to run and fails with "No test files found". It executes files at runtime only, with no type checking, and is driven by the "Debug Current Test File" config in `.vscode/launch.json`.
 
@@ -121,17 +146,20 @@ expect(true satisfies AssertTypeEquality<'a' | 'b', 'a'>).toBe(true);
 
 An unused `@ts-expect-error` is itself an error, so regressions fail the build in both directions.
 
-**Probe new edge cases against `tsc` before writing them down.** TypeScript's behaviour around `any`, `never`, unions, intersections and property modifiers is frequently not what it seems — write a scratch file that asserts the expected outcome, run `tsc --noEmit` on it, and let the errors tell you the truth. Reasoning it out and committing the result is how wrong tests get written.
+**Probe new edge cases against `tsc` before writing them down.** TypeScript's behaviour around `any`, `never`, unions, intersections and property modifiers is frequently not what it seems — write a scratch file under `./.workflow/.temp/<topic>/` (see [WORKFLOW.md](./WORKFLOW.md) › "Working files") that asserts the expected outcome, run `tsc --noEmit` on it, and let the errors tell you the truth. Reasoning it out and committing the result is how wrong tests get written.
+
+After adding or changing type-level assertions, sanity-check them: break one deliberately, confirm `npm run test:unit` fails, then revert. Vitest prints an "experimental" warning for typecheck, which is expected.
 
 ### Verifying README samples
 
-`README.md` code samples are annotated `// This will work` / `// This will fail at compile time`. Those claims are checkable: extract the ```ts blocks, point the import at `./src/assert/index.js`, and run `tsc --noEmit` — every "will work" line must compile and every "will fail" line must error. Do this whenever a sample or an exported type changes.
+`README.md` code samples are annotated `// This will work` / `// This will fail at compile time`. Those claims are checkable: extract the ```ts blocks into `./.workflow/.temp/<topic>/`, point the import at `../../../src/assert/index.js`, and run `tsc --noEmit` — every "will work" line must compile and every "will fail" line must error. Do this whenever a sample or an exported type changes.
 
 ## Code style
 
-Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — **`README.md` and `AGENTS.md` are not format-enforced**, so keep them tidy by hand.
+Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — **Markdown files are not format-enforced by CI**, so format each one you touch with Prettier, as [WORKFLOW.md](./WORKFLOW.md) › "Markdown formatting" describes.
 
 - Prettier: `printWidth: 160`, single quotes, 2-space indent, semicolons, trailing commas, always-parenthesised arrow params.
+- Every file opens with a descriptive header comment.
 - JSDoc on every exported symbol. One-line summary in imperative third person ("Gets ...", "Asserts ...", "Checks if ..."). Types get a prefix: `Utility type: ...`. Only `@param` and `@returns` are used anywhere in this codebase — no `@example`, `@template` or `@see`.
 - Internal, non-exported symbols are `_`-prefixed (`_IsIdentical`, `_IsAssignable`) and still get JSDoc. ESLint's `no-unused-vars` ignores `_`-prefixed vars, args and catch bindings.
 - Group sections with `// #region Name` / `// #endregion`.
@@ -139,7 +167,10 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 - Utility types are named after the subject they operate on first: every array utility type starts with `Array` (`ArrayHead`, `ArrayTail`, `ArrayIsEmpty` — not `IsArrayEmpty`). Predicate types carry `Is` after that prefix and resolve to `true`, `false` or `boolean`. This differs from the `Assert*` types, which resolve to `true` or `never` so that consuming a failed one breaks compilation.
 - Array utility types take `TArray extends readonly unknown[]` so that `readonly` and `as const` tuples are accepted, match with `readonly [...]` patterns, and keep the naked `TArray` as the check type of their outermost conditional so they distribute over unions and map `never` to `never`.
 - Object utility types start with `Object` and take `TObject extends object`, keeping the naked `TObject` as the check type of their outermost conditional (`TObject extends unknown ? ... : never`) for the same distribution and `never` behaviour.
-- `it()` names are capitalised verb phrases: `it('Holds for identical primitive types', ...)`.
+- In conditional type chains, put a `// comment` line before each branch saying what it handles, rather than a trailing comment.
+- Each test file has one top-level `describe` named after its module. `it()` names are capitalised verb phrases: `it('Holds for identical primitive types', ...)`.
+- **Every `describe` callback opens with a purpose comment.** It is a `//` block on the first line inside the callback, saying _what_ is under test and _how_ it is tested. A nested `describe` says only what its parent's comment does not.
+- **An `it` callback gets a comment only when its title and body do not explain why it exists.** Examples: a regression, an edge case, a test guarding a gotcha (link it: `See AGENTS.md › <gotcha title>`), or a non-obvious assertion. Never restate the title.
 - Rules deliberately off: `@typescript-eslint/no-explicit-any`, `ban-ts-comment`, `no-empty-object-type`. `any` and `@ts-expect-error` are fine to use where they earn their place.
 
 ## Gotchas and known issues
@@ -162,21 +193,20 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 - **`keyof` of an index signature depends on how it is written:** `keyof { [key: string]: X }` is `string | number`, but `keyof Record<string, X>` is just `string`.
 - **ESLint's typed-linting block sets `tsconfigRootDir: import.meta.dirname`**, the directory `project: './tsconfig.json'` is resolved against. Left unset, typescript-eslint 8 infers it: reading `ts.configs.*` records the calling config file's directory as a candidate, falling back to `process.cwd()` with no candidate and throwing "multiple candidate TSConfigRootDirs" with more than one (e.g. an editor loading several workspace configs in one process). Setting it explicitly makes linting independent of that heuristic and of the working directory.
 - `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json`. Only `extensions.json` and `launch.json` are currently committed; any other `.vscode/` file must be re-included there before it can be.
+- **`*.gitignore.*` files and `*.gitignore/` directories are local-only** (e.g. `TODO.gitignore.md`), a convention for keeping scratch files next to the code. `.gitignore` ignores them, so never commit them.
 - **Not yet adopted:** the sibling `ts-std` repo keeps a `src/readme.spec.ts` whose `describe`/`it` tree mirrors its README headings 1:1, turning documentation examples into executable tests. This repo has no equivalent — consider adding one if the README grows.
 
 ## Continuous integration
 
 `.github/workflows/ci.yml` runs `npm ci && npm run ci` on every pull request targeting, and every push to, `master` or `develop`, across a Node matrix of `[22, 24]` with `fail-fast: false`. In-progress runs are cancelled only for pull requests, never for `master`.
 
-**Dependabot does not yet match the [branching model](#branching).** `.github/dependabot.yml` sets no `target-branch`, so Dependabot opens its pull requests against the default branch rather than `develop`.
-
 **A workflow alone does not block merges.** Making it mandatory requires branch protection on `master` in GitHub repo settings, marking `CI / Node 22` and `CI / Node 24` as required status checks. That is a repo setting, not a file in this repository.
 
-`.github/` also holds `pull_request_template.md` (adapted from the author's template in the `kickstart` repo) and `dependabot.yml` (weekly npm and github-actions updates, with devDependencies grouped into one pull request, and `@types/node` majors ignored).
+`.github/` also holds `pull_request_template.md` (adapted from the author's template in the `kickstart` repo) and `dependabot.yml` (weekly npm and github-actions updates against `develop`, with devDependencies grouped into one pull request, and `@types/node` majors ignored).
 
 ## Exports
 
-The public surface, re-exported from `src/index.ts`. Keep this list in sync (see [Keeping this file and README.md current](#keeping-this-file-and-readmemd-current)).
+The public surface, re-exported from `src/index.ts`. Keep this list in sync (see [Keeping documentation and tests current](#keeping-documentation-and-tests-current)).
 
 From `src/assert`, all compile-time assertion types resolving to `true` or `never`:
 
@@ -196,3 +226,11 @@ From `src/object`, object utility types accepting any object type, distributing 
 - `ObjectIsEmpty<TObject>` — `true` with no known keys (`{}`, `object`), `false` with a required property, `boolean` when it may or may not be empty (only optional properties, index signatures).
 - `ObjectKeys<TObject>` — tuple of all keys (string, number, symbol), in unspecified order; `[]` with no known keys.
 - `ObjectValues<TObject>` — tuple of property types, index-aligned with `ObjectKeys`; optional properties joined with `undefined`.
+
+---
+
+## Workflow
+
+Follow the workflow defined in [WORKFLOW.md](./WORKFLOW.md).
+
+@WORKFLOW.md

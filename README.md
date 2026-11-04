@@ -330,3 +330,6 @@ true satisfies AssertTypeEquality<ObjectValues<{ a?: 1 }>, [1]>; // This will fa
 # Contributing
 
 For reporting issues, contribution workflow and branching, see [CONTRIBUTE.md](./CONTRIBUTE.md).
+For releasing a version, see [PUBLISH.md](./PUBLISH.md).
+
+MIT - see [LICENSE](./LICENSE).

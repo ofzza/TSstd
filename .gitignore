@@ -53,3 +53,6 @@ $RECYCLE.BIN/
 *.debug.test.[jt]s
 *.debug.test.[jt]sx
 *-ontology
+
+# Repo skill workflow
+/.workflow/.temp/
