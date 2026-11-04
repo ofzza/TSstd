@@ -16,12 +16,18 @@
  * A type that has no element to resolve to - the head or the tail of an empty tuple - resolves to `never`.
  */
 
+// #region Internal helpers
+
 /**
  * Utility type: Gets a result array type, made `readonly` if the source array type is `readonly`
  *
  * Inferring the rest of a tuple through `readonly [unknown, ...infer TRest]` always infers a mutable `TRest`, even when matching a `readonly` tuple.
  */
 type _PreserveReadonly<TArray extends readonly unknown[], TResult extends readonly unknown[]> = TArray extends unknown[] ? TResult : Readonly<TResult>;
+
+// #endregion
+
+// #region Array utility types
 
 /**
  * Utility type: Checks if an array type is empty
@@ -31,10 +37,13 @@ type _PreserveReadonly<TArray extends readonly unknown[], TResult extends readon
  * non-empty tuple resolves to `boolean` as well.
  */
 export type ArrayIsEmpty<TArray extends readonly unknown[]> = TArray extends readonly []
-  ? true
+  ? // An empty tuple
+    true
   : TArray extends readonly [unknown, ...unknown[]] | readonly [...unknown[], unknown]
-    ? false
-    : boolean;
+    ? // A tuple with a required element, leading or trailing
+      false
+    : // A plain array, or a tuple of only optional elements: may or may not be empty
+      boolean;
 
 /**
  * Utility type: Gets the type of the first element of an array type
@@ -46,12 +55,16 @@ export type ArrayIsEmpty<TArray extends readonly unknown[]> = TArray extends rea
  * Note that the head of `[never]` is `never` too, and is indistinguishable from the head of `[]`.
  */
 export type ArrayHead<TArray extends readonly unknown[]> = TArray extends readonly []
-  ? never
+  ? // An empty tuple has no head
+    never
   : TArray extends readonly [infer THead, ...unknown[]]
-    ? THead
+    ? // A tuple starting with a required element
+      THead
     : TArray extends readonly [...unknown[], unknown]
-      ? TArray[number]
-      : TArray[0] | undefined;
+      ? // A tuple starting with a rest element: the head may be any of its elements
+        TArray[number]
+      : // A plain array, or a tuple starting with an optional element: the head may not exist
+        TArray[0] | undefined;
 
 /**
  * Utility type: Gets an array type of all the elements of an array type except the first one
@@ -63,11 +76,18 @@ export type ArrayHead<TArray extends readonly unknown[]> = TArray extends readon
  * `(string | 1)[]`, because the exact tail is a union of tuples that grows with every trailing element.
  */
 export type ArrayTail<TArray extends readonly unknown[]> = TArray extends readonly []
-  ? never
+  ? // An empty tuple has no tail
+    never
   : TArray extends readonly [unknown, ...infer TRest]
-    ? _PreserveReadonly<TArray, TRest>
+    ? // A tuple starting with a required element
+      _PreserveReadonly<TArray, TRest>
     : TArray extends readonly [...unknown[], unknown]
-      ? _PreserveReadonly<TArray, Array<TArray[number]>>
+      ? // A tuple starting with a rest element: widened to a plain array of all its element types
+        _PreserveReadonly<TArray, Array<TArray[number]>>
       : TArray extends readonly [unknown?, ...infer TRest]
-        ? _PreserveReadonly<TArray, TRest>
-        : never;
+        ? // A plain array, or a tuple starting with an optional element
+          _PreserveReadonly<TArray, TRest>
+        : // Fallback, not expected to be reached: every array type matches one of the branches above
+          never;
+
+// #endregion

@@ -1,19 +1,10 @@
-import { describe, it, expect } from 'vitest';
-import type { AssertTypeEquality, AssertTypeAssignable } from '../assert/index';
-import type { ObjectIsEmpty, ObjectKeys, ObjectValues } from './index';
-
 /**
- * Every utility type is tested by asserting its result with `AssertTypeEquality`, which resolves to `true` when it holds and to `never` when it doesn't, so
- * `true satisfies <assertion>` compiles only while the assertion holds. The assertions are therefore checked by TSC (the `unit` vitest project's typecheck
- * pass, which is the only pass a `*.test-d.ts` file goes through). The `expect()` wrapping them is never executed; it is kept so that assertions are written
- * the same way here as in a regular, executed test file.
- *
- * Results that are expected not to hold are marked with `@ts-expect-error`, which TSC reports as an error of its own when unused - so both a
- * correct result that starts being wrong and a wrong result that starts being reported as correct break the build.
- *
- * The order of the elements of `ObjectKeys` and `ObjectValues` is unspecified, so exact tuples are only ever asserted for object types with a
- * single key. Object types with more keys are asserted through the union of their elements, their length, and the alignment of values with keys.
+ * Type-only tests of the object utility types in `src/object`.
  */
+
+import { describe, it, expect } from 'vitest';
+import type { AssertTypeEquality, AssertTypeAssignable } from '../assert/index.js';
+import type { ObjectIsEmpty, ObjectKeys, ObjectValues } from './index.js';
 
 const symbol = Symbol();
 
@@ -25,7 +16,19 @@ interface Interface {
 type Large = { [TKey in `key${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}${0 | 1}`]: TKey };
 
 describe('object', () => {
+  // Every utility type is tested by asserting its result with `AssertTypeEquality`, which resolves to `true` when it holds and to `never` when it doesn't, so
+  // `true satisfies <assertion>` compiles only while the assertion holds. The assertions are therefore checked by TSC (the `unit` vitest project's typecheck
+  // pass, which is the only pass a `*.test-d.ts` file goes through). The `expect()` wrapping them is never executed; it is kept so that assertions are written
+  // the same way here as in a regular, executed test file.
+  //
+  // Results that are expected not to hold are marked with `@ts-expect-error`, which TSC reports as an error of its own when unused - so both a
+  // correct result that starts being wrong and a wrong result that starts being reported as correct break the build.
+  //
+  // The order of the elements of `ObjectKeys` and `ObjectValues` is unspecified, so exact tuples are only ever asserted for object types with a
+  // single key. Object types with more keys are asserted through the union of their elements, their length, and the alignment of values with keys.
+
   describe('ObjectIsEmpty<TObject>', () => {
+    // Empty, non-empty and may-be-empty object types, index signatures, unions, and the `never` and `any` edge cases.
     it('Resolves to `true` for an object type with no known keys', () => {
       expect(true satisfies AssertTypeEquality<ObjectIsEmpty<{}>, true>).toBe(true);
       // `object` has no known keys either
@@ -77,6 +80,7 @@ describe('object', () => {
   });
 
   describe('ObjectKeys<TObject>', () => {
+    // Single and multiple keys, property modifiers, index signatures, many keys, unions, and the `never` and `any` edge cases.
     it('Gets a tuple of the key of an object type with a single key', () => {
       expect(true satisfies AssertTypeEquality<ObjectKeys<{ a: 1 }>, ['a']>).toBe(true);
       expect(true satisfies AssertTypeEquality<ObjectKeys<{ 0: 1 }>, [0]>).toBe(true);
@@ -134,6 +138,7 @@ describe('object', () => {
   });
 
   describe('ObjectValues<TObject>', () => {
+    // The same kinds of object types as `ObjectKeys`, with optional properties joined with `undefined`.
     it('Gets a tuple of the value of an object type with a single key', () => {
       expect(true satisfies AssertTypeEquality<ObjectValues<{ a: 1 }>, [1]>).toBe(true);
       expect(true satisfies AssertTypeEquality<ObjectValues<{ readonly a: 1 }>, [1]>).toBe(true);
@@ -182,6 +187,7 @@ describe('object', () => {
   });
 
   describe('Relationships between the utility types', () => {
+    // Checks the utility types against each other: emptiness, length and the alignment of values with keys.
     it('Resolves to empty keys and values exactly when the object type is empty', () => {
       expect(true satisfies AssertTypeEquality<ObjectIsEmpty<{}>, true>).toBe(true);
       expect(true satisfies AssertTypeEquality<ObjectKeys<{}>, []>).toBe(true);

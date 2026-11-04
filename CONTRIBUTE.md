@@ -2,8 +2,6 @@
 
 ## Reporting Issues
 
-When reporting issues, please keep to provided templates.
-
 Before reporting issues, please read: [GitHub Work-Flow](https://github.com/ofzza/onboarding/blob/master/CONTRIBUTING/github.md)
 
 ## Contributing Code
@@ -22,7 +20,7 @@ Small changes are committed directly to the branch you are working on, usually `
 
 Before committing or requesting a merge, make sure `npm run ci` passes locally (build, ESLint, Prettier and tests), and that `README.md`, `CONTRIBUTE.md` and `AGENTS.md` reflect the change.
 
-When creating issues and PRs, please keep to provided templates.
+When opening a pull request, please keep to the provided pull request template.
 
 ## Architecture and glossary
 

@@ -15,6 +15,8 @@
  * the type of the property whose key is at the same index.
  */
 
+// #region Internal helpers
+
 /**
  * Utility type: Gets the intersection of all the members of a union type
  *
@@ -38,13 +40,19 @@ type _UnionLast<TUnion> = _UnionToIntersection<TUnion extends unknown ? () => TU
  * members instead of failing with "Type instantiation is excessively deep" after a few dozen.
  */
 type _UnionToTuple<TUnion, TResult extends unknown[] = []> = [TUnion] extends [never]
-  ? TResult
-  : _UnionToTuple<Exclude<TUnion, _UnionLast<TUnion>>, [_UnionLast<TUnion>, ...TResult]>;
+  ? // No members left: the accumulated tuple is complete
+    TResult
+  : // Move one member from the union to the front of the tuple, and recurse on the rest
+    _UnionToTuple<Exclude<TUnion, _UnionLast<TUnion>>, [_UnionLast<TUnion>, ...TResult]>;
 
 /**
  * Utility type: Gets a tuple type of the types of the properties of an object type, whose keys are listed in a tuple type
  */
 type _ObjectValuesOf<TObject extends object, TKeys extends readonly unknown[]> = { [TIndex in keyof TKeys]: TObject[TKeys[TIndex] & keyof TObject] };
+
+// #endregion
+
+// #region Object utility types
 
 /**
  * Utility type: Checks if an object type is empty
@@ -57,11 +65,15 @@ type _ObjectValuesOf<TObject extends object, TKeys extends readonly unknown[]> =
  */
 export type ObjectIsEmpty<TObject extends object> = TObject extends unknown
   ? [keyof TObject] extends [never]
-    ? true
+    ? // No known keys
+      true
     : {} extends TObject
-      ? boolean
-      : false
-  : never;
+      ? // Only optional properties or an index signature, so `{}` is assignable to it: may or may not be empty
+        boolean
+      : // At least one required property
+        false
+  : // Never taken: only distributes over a union
+    never;
 
 /**
  * Utility type: Gets a tuple type of all the keys of an object type
@@ -83,3 +95,5 @@ export type ObjectKeys<TObject extends object> = TObject extends unknown ? _Unio
  * known keys.
  */
 export type ObjectValues<TObject extends object> = TObject extends unknown ? _ObjectValuesOf<TObject, ObjectKeys<TObject>> : never;
+
+// #endregion

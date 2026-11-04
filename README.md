@@ -8,7 +8,7 @@ TypeScript standard library, implementing commonly used TypeScript types, utilit
 
 Jump to section:
 
-- [Get TSstd](#get-TSstd)
+- [Get TSstd](#get-tsstd)
 - [Type assertions](#type-assertions)
   - [`AssertTypeEquality<A, B>`](#asserttypeequalitya-b)
   - [`AssertTypeInequality<A, B>`](#asserttypeinequalitya-b)
@@ -175,7 +175,7 @@ The row that catches most hand-written equality checks is `{ a: string }` vs `{ 
 
 ## Writing type level tests
 
-Assertions are checked by the compiler, not at runtime, so a test file full of them only earns its keep if something actually type checks it. With Vitest, that means enabling [`typecheck`](https://vitest.dev/guide/testing-types), which runs `tsc` over your test files and reports type errors as test failures. In this repository every test is a type-only `*.test-d.ts` file, which Vitest only type checks and never executes.
+Assertions are checked by the compiler, not at runtime, so a test file full of them only earns its keep if something actually type checks it. With Vitest, that means enabling [`typecheck`](https://vitest.dev/guide/testing-types), which runs `tsc` over your test files and reports type errors as test failures. Type-only test files, named `*.test-d.ts`, are only type checked and never executed.
 
 Wrap each assertion in an `expect()`, so the same line works in a type-only file and also registers as a regular expectation in a test file that is executed, and mark the cases you expect to fail with `@ts-expect-error`:
 
@@ -195,7 +195,7 @@ describe('Uppercase', () => {
 
 An unused `@ts-expect-error` is itself a compile error, so this catches regressions in both directions: an assertion that starts failing breaks the build, and so does one that was supposed to fail and no longer does.
 
-See `src/assert/index.test-d.ts` for the full suite written this way.
+See [`src/assert/index.test-d.ts`](https://github.com/ofzza/TSstd/blob/master/src/assert/index.test-d.ts) for this library's own suite, written this way.
 
 # Arrays
 

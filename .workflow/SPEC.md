@@ -20,7 +20,7 @@ The public surface is everything re-exported from `src/index.ts`. Each export is
 
 ### Conventions every export follows
 
-These are defined in [AGENTS.md › Code style](../AGENTS.md#code-style) and the Glossary in [CONTRIBUTE.md](../CONTRIBUTE.md#glossary):
+These are defined in [WORKFLOW.custom.md › Code style](../WORKFLOW.custom.md#code-style-hard-rule), a hard rule, and the Glossary in [CONTRIBUTE.md](../CONTRIBUTE.md#glossary):
 
 - Utility types are named after their subject first (`Array*`, `Object*`). Predicate types put `Is` after that prefix and resolve to `true`, `false` or `boolean`.
 - Assertion types resolve to `true` or `never`, and are consumed by assigning `true` to them, never through a generic constraint.

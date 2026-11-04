@@ -1,17 +1,9 @@
-import { describe, it, expect } from 'vitest';
-import type { AssertTypeEquality, AssertTypeInequality, AssertTypeAssignable, AssertTypeUnassignable } from './index';
-
 /**
- * Every assertion type resolves to `true` when it holds and to `never` when it doesn't, so `true satisfies <assertion>` compiles only while the assertion
- * holds. The assertions are therefore checked by TSC (the `unit` vitest project's typecheck pass, which is the only pass a `*.test-d.ts` file goes through).
- * The `expect()` wrapping them is never executed; it is kept so that assertions are written the same way here as in a regular, executed test file.
- *
- * Assertions that are expected not to hold are marked with `@ts-expect-error`, which TSC reports as an error of its own when unused - so both a
- * passing assertion that starts failing and a failing assertion that starts passing break the build.
- *
- * Note that an assertion can only ever be consumed by assigning `true` to it, never through a generic constraint: `never extends true` is `true`,
- * so a constraint is satisfied by a failed assertion just as much as by a passing one.
+ * Type-only tests of the compile-time assertion types in `src/assert`.
  */
+
+import { describe, it, expect } from 'vitest';
+import type { AssertTypeEquality, AssertTypeInequality, AssertTypeAssignable, AssertTypeUnassignable } from './index.js';
 
 type AliasedString = string;
 type ObjA = { a: string };
@@ -25,7 +17,18 @@ type ObjAOptional = { a?: string };
 type ObjAUndefinable = { a: string | undefined };
 
 describe('assert', () => {
+  // Every assertion type resolves to `true` when it holds and to `never` when it doesn't, so `true satisfies <assertion>` compiles only while the assertion
+  // holds. The assertions are therefore checked by TSC (the `unit` vitest project's typecheck pass, which is the only pass a `*.test-d.ts` file goes through).
+  // The `expect()` wrapping them is never executed; it is kept so that assertions are written the same way here as in a regular, executed test file.
+  //
+  // Assertions that are expected not to hold are marked with `@ts-expect-error`, which TSC reports as an error of its own when unused - so both a
+  // passing assertion that starts failing and a failing assertion that starts passing break the build.
+  //
+  // Note that an assertion can only ever be consumed by assigning `true` to it, never through a generic constraint: `never extends true` is `true`,
+  // so a constraint is satisfied by a failed assertion just as much as by a passing one.
+
   describe('AssertTypeEquality<A, B>', () => {
+    // Identity: identical, aliased and reordered types must hold; widened, `any`/`unknown`/`never`, union members and modifier-only differences must not.
     it('Holds for identical primitive types', () => {
       expect(true satisfies AssertTypeEquality<string, string>).toBe(true);
       expect(true satisfies AssertTypeEquality<number, number>).toBe(true);
@@ -131,6 +134,7 @@ describe('assert', () => {
   });
 
   describe('AssertTypeInequality<A, B>', () => {
+    // The dual of `AssertTypeEquality`, against the same kinds of pairs with the expected outcomes inverted.
     it('Holds for different primitive and literal types', () => {
       expect(true satisfies AssertTypeInequality<string, number>).toBe(true);
       expect(true satisfies AssertTypeInequality<null, undefined>).toBe(true);
@@ -182,6 +186,7 @@ describe('assert', () => {
   });
 
   describe('AssertTypeAssignable<A, B>', () => {
+    // Directional assignability: narrower to wider, the top and bottom types, and the variance rules of composite types.
     it('Holds for a type assigned to itself', () => {
       expect(true satisfies AssertTypeAssignable<string, string>).toBe(true);
       expect(true satisfies AssertTypeAssignable<ObjA, ObjADuplicate>).toBe(true);
@@ -249,6 +254,7 @@ describe('assert', () => {
   });
 
   describe('AssertTypeUnassignable<A, B>', () => {
+    // The dual of `AssertTypeAssignable`, against the same kinds of pairs with the expected outcomes inverted.
     it('Holds for unrelated types', () => {
       expect(true satisfies AssertTypeUnassignable<string, number>).toBe(true);
       expect(true satisfies AssertTypeUnassignable<null, undefined>).toBe(true);
@@ -290,6 +296,7 @@ describe('assert', () => {
   });
 
   describe('Relationships between the assertions', () => {
+    // Pairs every assertion with its dual and equality with assignability, over a shared set of type pairs.
     it('Resolves exactly one of AssertTypeEquality and AssertTypeInequality for any pair of types', () => {
       expect(true satisfies AssertTypeEquality<never, never>).toBe(true);
       // @ts-expect-error ... so the inequality cannot also hold

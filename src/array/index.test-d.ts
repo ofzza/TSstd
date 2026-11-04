@@ -1,22 +1,25 @@
-import { describe, it, expect } from 'vitest';
-import type { AssertTypeEquality, AssertTypeAssignable } from '../assert/index';
-import type { ArrayIsEmpty, ArrayHead, ArrayTail } from './index';
-
 /**
- * Every utility type is tested by asserting its result with `AssertTypeEquality`, which resolves to `true` when it holds and to `never` when it doesn't, so
- * `true satisfies <assertion>` compiles only while the assertion holds. The assertions are therefore checked by TSC (the `unit` vitest project's typecheck
- * pass, which is the only pass a `*.test-d.ts` file goes through). The `expect()` wrapping them is never executed; it is kept so that assertions are written
- * the same way here as in a regular, executed test file.
- *
- * Results that are expected not to hold are marked with `@ts-expect-error`, which TSC reports as an error of its own when unused - so both a
- * correct result that starts being wrong and a wrong result that starts being reported as correct break the build.
+ * Type-only tests of the array and tuple utility types in `src/array`.
  */
+
+import { describe, it, expect } from 'vitest';
+import type { AssertTypeEquality, AssertTypeAssignable } from '../assert/index.js';
+import type { ArrayIsEmpty, ArrayHead, ArrayTail } from './index.js';
 
 type Tuple = [1, 2, 3];
 type ReadonlyTuple = readonly [1, 2, 3];
 
 describe('array', () => {
+  // Every utility type is tested by asserting its result with `AssertTypeEquality`, which resolves to `true` when it holds and to `never` when it doesn't, so
+  // `true satisfies <assertion>` compiles only while the assertion holds. The assertions are therefore checked by TSC (the `unit` vitest project's typecheck
+  // pass, which is the only pass a `*.test-d.ts` file goes through). The `expect()` wrapping them is never executed; it is kept so that assertions are written
+  // the same way here as in a regular, executed test file.
+  //
+  // Results that are expected not to hold are marked with `@ts-expect-error`, which TSC reports as an error of its own when unused - so both a
+  // correct result that starts being wrong and a wrong result that starts being reported as correct break the build.
+
   describe('ArrayIsEmpty<TArray>', () => {
+    // Empty, non-empty and may-be-empty array types, unions, and the `never` and `any` edge cases.
     it('Resolves to `true` for an empty tuple', () => {
       expect(true satisfies AssertTypeEquality<ArrayIsEmpty<[]>, true>).toBe(true);
       expect(true satisfies AssertTypeEquality<ArrayIsEmpty<readonly []>, true>).toBe(true);
@@ -67,6 +70,7 @@ describe('array', () => {
   });
 
   describe('ArrayHead<TArray>', () => {
+    // Tuples, `readonly` tuples, optional and rest elements, plain arrays, unions, and the `never` and `any` edge cases.
     it('Gets the first element type of a tuple', () => {
       expect(true satisfies AssertTypeEquality<ArrayHead<[1]>, 1>).toBe(true);
       expect(true satisfies AssertTypeEquality<ArrayHead<Tuple>, 1>).toBe(true);
@@ -118,6 +122,7 @@ describe('array', () => {
   });
 
   describe('ArrayTail<TArray>', () => {
+    // Tuples, preserved labels and `readonly`, optional and rest elements, plain arrays, unions, and the `never` and `any` edge cases.
     it('Gets all but the first element of a tuple', () => {
       expect(true satisfies AssertTypeEquality<ArrayTail<[1]>, []>).toBe(true);
       expect(true satisfies AssertTypeEquality<ArrayTail<Tuple>, [2, 3]>).toBe(true);
@@ -179,6 +184,7 @@ describe('array', () => {
   });
 
   describe('Relationships between the utility types', () => {
+    // Checks the utility types against each other rather than against fixed results.
     it('Resolves the head to `never` exactly when the array type is empty', () => {
       expect(true satisfies AssertTypeEquality<ArrayIsEmpty<[]>, true>).toBe(true);
       expect(true satisfies AssertTypeEquality<ArrayHead<[]>, never>).toBe(true);

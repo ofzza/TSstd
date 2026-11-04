@@ -15,6 +15,8 @@
  * (`never extends true` is `true`), so a constraint such as `<T extends true>` cannot tell a passing assertion from a failing one.
  */
 
+// #region Internal helpers
+
 /**
  * Utility type: Checks if two types are identical, which is stricter than the two being mutually assignable
  *
@@ -32,30 +34,38 @@ type _IsIdentical<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T exte
  */
 type _IsAssignable<A, B> = [A] extends [B] ? true : false;
 
+// #endregion
+
+// #region Assertion types
+
 /**
- * Assert that two types are equal
+ * Utility type: Asserts that two types are equal
  *
  * Equality here means type identity, not mutual assignability: `{ a: string }` and `{ readonly a: string }` are assignable to each other but are
  * not equal, and neither are `any` and `unknown`.
  */
 export type AssertTypeEquality<A, B> = _IsIdentical<A, B> extends true ? true : never;
+
 /**
- * Assert that two types are not equal
+ * Utility type: Asserts that two types are not equal
  *
  * The exact dual of `AssertTypeEquality` - for any pair of types exactly one of the two resolves to `true`.
  */
 export type AssertTypeInequality<A, B> = _IsIdentical<A, B> extends true ? never : true;
 
 /**
- * Assert that a type is assignable to another type
+ * Utility type: Asserts that a type is assignable to another type
  *
  * Assignability is directional and weaker than equality: every `A` equal to `B` is assignable to `B`, but not the other way around. `never` is
  * assignable to every type, and every type is assignable to `any` and to `unknown`.
  */
 export type AssertTypeAssignable<A, B> = _IsAssignable<A, B> extends true ? true : never;
+
 /**
- * Assert that a type is not assignable to another type
+ * Utility type: Asserts that a type is not assignable to another type
  *
  * The exact dual of `AssertTypeAssignable` - for any pair of types exactly one of the two resolves to `true`.
  */
 export type AssertTypeUnassignable<A, B> = _IsAssignable<A, B> extends true ? never : true;
+
+// #endregion
