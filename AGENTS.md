@@ -14,19 +14,19 @@ New or changed behaviour gets tests in the `*.test-d.ts` (or, for runtime code, 
 
 Concrete triggers:
 
-| A change that ...                                               | ... requires updating                                                                |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| changes behaviour or code                                       | the `*.test-d.ts` / `*.test.ts` beside it                                            |
-| adds, changes or removes a test                                 | the purpose comment of its `describe`, and of the `it` if it has one                 |
-| adds, removes or renames an export                              | `README.md` API section, and [Exports](#exports) below                               |
-| changes an exported type's or function's semantics              | `README.md` API section and any example that demonstrates it                         |
-| adds or changes an npm script, Vitest project or tsconfig       | [Commands](#commands) / [Testing](#testing), and `# Development` in `README.md`      |
-| changes the release process or `package.json` publishing fields | `PUBLISH.md`                                                                         |
-| changes the branching model or contribution workflow            | [Branching](#branching) below, and `CONTRIBUTE.md`                                   |
-| adds a source directory under `src/`                            | [Layout](#layout) below, and the project structure in `CONTRIBUTE.md`                |
-| introduces, renames or retires a concept or term                | the glossary in `CONTRIBUTE.md`, and every identifier, comment and document using it |
-| establishes a new convention, or hits a new gotcha              | [Code style](#code-style) / [Gotchas and known issues](#gotchas-and-known-issues)    |
-| resolves one of the known issues listed below                   | remove it from [Gotchas and known issues](#gotchas-and-known-issues)                 |
+| A change that ...                                               | ... requires updating                                                                    |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| changes behaviour or code                                       | the `*.test-d.ts` / `*.test.ts` beside it                                                |
+| adds, changes or removes a test                                 | the purpose comment of its `describe`, and of the `it` if it has one                     |
+| adds, removes or renames an export                              | `README.md` API section, and [Exports](#exports) below                                   |
+| changes an exported type's or function's semantics              | `README.md` API section and any example that demonstrates it                             |
+| adds or changes an npm script, Vitest project or tsconfig       | [Commands](#commands) / [Testing](#testing), and `# Development` in `README.md`          |
+| changes the release process or `package.json` publishing fields | `PUBLISH.md`                                                                             |
+| changes the branching model or contribution workflow            | [Branching](./WORKFLOW.custom.md#branching) in `WORKFLOW.custom.md`, and `CONTRIBUTE.md` |
+| adds a source directory under `src/`                            | [Layout](#layout) below, and the project structure in `CONTRIBUTE.md`                    |
+| introduces, renames or retires a concept or term                | the glossary in `CONTRIBUTE.md`, and every identifier, comment and document using it     |
+| establishes a new convention, or hits a new gotcha              | [Code style](#code-style) / [Gotchas and known issues](#gotchas-and-known-issues)        |
+| resolves one of the known issues listed below                   | remove it from [Gotchas and known issues](#gotchas-and-known-issues)                     |
 
 New Glossary terms are proposed, and existing ones renamed or retired only when asked, as [WORKFLOW.md](./WORKFLOW.md) › "Glossary" describes.
 
@@ -43,17 +43,11 @@ TSstd — a TypeScript standard library of commonly used types, utility types an
 
 ## Branching
 
-- **Commit to the current branch by default.** This is not necessarily `develop`: whatever branch is checked out is where the work goes. Do not create a feature branch unless the user asks for one.
-- **Never commit to `master`, or onto a detached HEAD.** If the current branch is `master` (or there is none), stop and ask the user where the work should go: normally `develop` or a new feature branch.
-- **Propose a feature branch when a change warrants one.** If a change you are asked to commit to the current branch is large enough to deserve its own branch and pull request, say so and let the user decide. Do not branch on your own.
-- **Feature branches** are named after the work, e.g. `feature/<short-topic>` or `fix/<short-topic>`. When work on a feature branch is committed and pushed, **PROPOSE** opening a pull request into `develop` (see [WORKFLOW.md](./WORKFLOW.md) › "Outward actions").
-- **`develop` is the work-in-progress trunk.** Create every feature, fix or dependency branch from `develop`, and open every pull request against `develop`.
-- **`master` holds only the latest stable release.** It is never committed to directly and never receives feature pull requests — it is only updated by merging `develop` into it when a stable version is released.
+The branching rules are workflow rules, in [WORKFLOW.custom.md](./WORKFLOW.custom.md#branching).
 
 ## Commits
 
-- Commit messages have an imperative summary line, and explain _why_ in the body when it is not obvious from the change.
-- **No AI attribution**, anywhere: see [WORKFLOW.md](./WORKFLOW.md) › "No AI attribution", a hard rule.
+The commit rules are workflow rules, in [WORKFLOW.custom.md](./WORKFLOW.custom.md#commits).
 
 ## Layout
 
@@ -193,7 +187,7 @@ Enforced by `ci:prettier` and `ci:eslint`, both of which only look at `src` — 
 - **`keyof` of an index signature depends on how it is written:** `keyof { [key: string]: X }` is `string | number`, but `keyof Record<string, X>` is just `string`.
 - **ESLint's typed-linting block sets `tsconfigRootDir: import.meta.dirname`**, the directory `project: './tsconfig.json'` is resolved against. Left unset, typescript-eslint 8 infers it: reading `ts.configs.*` records the calling config file's directory as a candidate, falling back to `process.cwd()` with no candidate and throwing "multiple candidate TSConfigRootDirs" with more than one (e.g. an editor loading several workspace configs in one process). Setting it explicitly makes linting independent of that heuristic and of the working directory.
 - `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json`. Only `extensions.json` and `launch.json` are currently committed; any other `.vscode/` file must be re-included there before it can be.
-- **`*.gitignore.*` files and `*.gitignore/` directories are local-only** (e.g. `TODO.gitignore.md`), a convention for keeping scratch files next to the code. `.gitignore` ignores them, so never commit them.
+- **`*.gitignore.*` files and `*.gitignore/` directories are local-only** (e.g. `TODO.gitignore.md`), a convention for keeping scratch files next to the code. `.gitignore` ignores them, so never commit them. They are for your own local notes: an agent's working files still go under `./.workflow/.temp/<topic>/` (see [WORKFLOW.md](./WORKFLOW.md) › "Working files").
 - **Not yet adopted:** the sibling `ts-std` repo keeps a `src/readme.spec.ts` whose `describe`/`it` tree mirrors its README headings 1:1, turning documentation examples into executable tests. This repo has no equivalent — consider adding one if the README grows.
 
 ## Continuous integration
