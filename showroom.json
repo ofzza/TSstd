@@ -1,0 +1,5 @@
+{
+  "stack": "typescript",
+  "ignore": [".workflow/*"],
+  "documentation": ["PUBLISH.md"]
+}

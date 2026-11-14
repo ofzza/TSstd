@@ -38,7 +38,7 @@ These are set out in [AGENTS.md › Project](../AGENTS.md#project):
 
 - Every module has type-only tests in a `*.test-d.ts` file beside it, which assert results with `src/assert`. See [AGENTS.md › Testing](../AGENTS.md#testing).
 - `README.md` code samples are checked against `tsc`. See [AGENTS.md › Verifying README samples](../AGENTS.md#verifying-readme-samples).
-- CI (`npm run ci`, which runs build, ESLint, Prettier and the tests) passes on Node 22 and 24. See [AGENTS.md › Continuous integration](../AGENTS.md#continuous-integration).
+- CI (`npm run ci`, which runs build, the showroom check, ESLint, Prettier and the tests) passes on Node 22 and 24. See [AGENTS.md › Continuous integration](../AGENTS.md#continuous-integration).
 - Releases follow [PUBLISH.md](../PUBLISH.md).
 
 ## Time and complexity
@@ -65,6 +65,7 @@ Rule 5 is abbreviated on purpose (decided 2026-11-04); the full text is in `AGEN
 - **The Vitest `typecheck.spawnTimeout` workaround** is pinned against a Vitest 5 bug (checked up to 5.1.0). A Vitest upgrade may make it unnecessary, or break it. Taken by: S4 (handled).
 - **A workflow alone does not block merges.** Requiring CI before merging into `master` is a GitHub repository setting, outside this repository. Taken by: S6.
 - **Only `0.1.0-alpha.1` has been published.** No stable version exists yet, so semver promises to consumers have not started. Taken by: S7.
+- **`@ofzza/showroom` is an alpha (`0.1.0-alpha.1`).** Its showcase markers, type checking and CLI may change in any release, and `ci:showroom` and the Pages workflow depend on them. Taken by: S9.
 
 ## Open points
 

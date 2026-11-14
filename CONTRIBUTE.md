@@ -18,7 +18,7 @@ This repository uses two long-lived branches:
 
 Small changes are committed directly to the branch you are working on, usually `develop`. Larger work, or any work you want reviewed, goes in its own feature branch, created from `develop` and named after the work (see [Git Source-Control Work-Flow](https://github.com/ofzza/onboarding/blob/master/CONTRIBUTING/git.md) for branch naming conventions). Once it is pushed, request a merge into `develop` with a pull request. Ideally, accompany such work with its own issue.
 
-Before committing or requesting a merge, make sure `npm run ci` passes locally (build, ESLint, Prettier and tests), and that `README.md`, `CONTRIBUTE.md` and `AGENTS.md` reflect the change.
+Before committing or requesting a merge, make sure `npm run ci` passes locally (build, the showroom check, ESLint, Prettier and tests), and that `README.md`, `CONTRIBUTE.md` and `AGENTS.md` reflect the change. To see documentation changes as they will be published in the [showroom](https://ofzza.github.io/tsstd/), preview them with `npm run showroom`.
 
 When opening a pull request, please keep to the provided pull request template.
 

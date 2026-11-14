@@ -3,17 +3,19 @@
 ## Next session: start here
 
 - **Stage:** planning.
-- **Being worked on:** the draft segments S5 to S7 in [PLAN.md](./PLAN.md). The [specification](./SPEC.md) is approved.
-- **Next step:** approve the plan segments S5 to S7, settling their open points.
+- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1 and S9.5 are implemented and committed on branch `tsshowcase` (not pushed). The draft segments S6 and S7 wait for approval.
+- **Next step:** a go-ahead for the S9.2 spike.
 
 ## Open questions
 
-- The open points in [PLAN.md](./PLAN.md) under S4, S5, S6 and S7.
+- The open points in [PLAN.md](./PLAN.md) under S4, S6, S7 and S9.
 - The specification has no open points yet.
 
 ## Waiting on me
 
-- Approval of each draft plan segment (S5, S6, S7).
+- Approval of each draft plan segment (S6, S7).
+- A go-ahead for the S9.2 spike.
+- Whether to push `tsshowcase`.
 
 ## Running
 
@@ -26,3 +28,7 @@ None.
 - 2026-11-04: Specification approved ("Approve the spec"). The applied adopt reports in `.workflow/.temp/` were deleted, as you confirmed.
 - 2026-11-04: S8 (documentation review, and code style as a hard rule) approved by approving its plan, and implemented. You asked for the code style and the documentation-and-tests triggers to become workflow hard rules ("this should have been made a WORKFLOW hard rule"). Scope extended during implementation, with your yes ("Add both to S8"), to branch comments and test-file header comments.
 - 2026-11-04: S8 checkpoint approved ("Approve and commit").
+- 2026-11-15: Drafted S9 (documentation with `showroom`) from your choice of proposals P1 to P6, with `@ts-expect-error` for failing README samples. Added the pitfall that `@ofzza/showroom` is an alpha. A commit of the uncommitted `showroom` setup was cancelled because its documentation isn't written yet.
+- 2026-11-15: S9 approved ("Approve S9"), with the `WORKFLOW.custom.md` README-samples rule to be reworded in S9.2 ("Reword it") and S5 marked superseded by S9.2 ("Mark superseded").
+- 2026-11-15: S9.1 implemented: the `showroom` setup documented in `README.md`, `AGENTS.md`, `CONTRIBUTE.md` and SPEC › Quality.
+- 2026-11-15: S9.5 implemented on your request ("S9.5. Commit, don't push"): `homepage` points at the showroom, and `PUBLISH.md` is a showroom page. S9.1 and S9.5 approved and committed together.

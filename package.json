@@ -9,7 +9,7 @@
     "type-assertions",
     "type-testing"
   ],
-  "homepage": "https://github.com/ofzza/TSstd#readme",
+  "homepage": "https://ofzza.github.io/tsstd/",
   "bugs": {
     "url": "https://github.com/ofzza/TSstd/issues"
   },
@@ -38,8 +38,10 @@
     "prebuild": "npm run clean",
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json --watch",
+    "showroom": "showroom serve",
     "ci": "npm-run-all ci:*",
     "ci:build": "tsc -p tsconfig.build.json",
+    "ci:showroom": "showroom check --showcases --quiet",
     "ci:eslint": "eslint src",
     "ci:prettier": "prettier --check src",
     "ci:test-unit": "npm-run-all test:unit",
@@ -54,6 +56,7 @@
   "devDependencies": {
     "@eslint/compat": "^2.1.1",
     "@eslint/js": "^10.0.1",
+    "@ofzza/showroom": "^0.1.0-alpha.1",
     "@types/node": "^22.20.5",
     "eslint": "^10.11.0",
     "eslint-config-prettier": "^10.0.1",

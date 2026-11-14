@@ -4,6 +4,8 @@
 
 TypeScript standard library, implementing commonly used TypeScript types, utility types and related functionality.
 
+See its showroom, the documentation built by [`showroom`](https://www.npmjs.com/package/@ofzza/showroom): [ofzza.github.io/tsstd](https://ofzza.github.io/tsstd/).
+
 ---
 
 Jump to section:
@@ -323,9 +325,10 @@ true satisfies AssertTypeEquality<ObjectValues<{ a?: 1 }>, [1]>; // This will fa
 
 - `npm run build` - cleans `dist/` (`npm run clean`), then compiles `src/` into it with `tsconfig.build.json`, emitting declarations. A bare `tsc` only type checks, tests included, and emits nothing. Also run on `prepare`, so a local `npm install` builds too.
 - `npm run dev` - the same, in watch mode.
+- `npm run showroom` - previews the showroom, this documentation as published on [ofzza.github.io/tsstd](https://ofzza.github.io/tsstd/), on a local server, updating it as you edit the documentation. Run `npm run build` first: the showroom reads the library from `dist/`.
 - `npm test` - runs every `test:*` script.
   - `npm run test:unit` - a single Vitest invocation that executes runtime test files (`*.test.ts`) and type checks both those and type-only test files (`*.test-d.ts`), reporting type errors as test failures. All current tests are type-only.
-- `npm run ci` - runs every `ci:*` script: build, ESLint, Prettier and the tests. This is what GitHub Actions runs on every pull request targeting, and every push to, `master` or `develop`, against Node 22 and 24. It also runs on `prepublishOnly`, so `npm publish` refuses to publish a failing build.
+- `npm run ci` - runs every `ci:*` script: build, `showroom check --showcases` (the showroom's documentation and showcases), ESLint, Prettier and the tests. This is what GitHub Actions runs on every pull request targeting, and every push to, `master` or `develop`, against Node 22 and 24. It also runs on `prepublishOnly`, so `npm publish` refuses to publish a failing build.
 
 # Contributing
 

@@ -1,6 +1,6 @@
 # Plan
 
-How the [specification](./SPEC.md) is built. Drafted on 2026-11-04 from the repository's existing documentation and history. Segments S1 to S4 record work that is already done. S5 to S7 are drafts: none of them is approved, and none is implemented until it is. S8 is implemented.
+How the [specification](./SPEC.md) is built. Drafted on 2026-11-04 from the repository's existing documentation and history. Segments S1 to S4 record work that is already done. S6 and S7 are drafts: neither is approved, and neither is implemented until it is. S5 is superseded by S9.2. S8 is implemented. S9 is approved.
 
 | #                                                            | Segment                                             | Status              |
 | ------------------------------------------------------------ | --------------------------------------------------- | ------------------- |
@@ -8,10 +8,11 @@ How the [specification](./SPEC.md) is built. Drafted on 2026-11-04 from the repo
 | [S2](#s2-array-utility-types)                                | Array utility types                                 | Implemented         |
 | [S3](#s3-object-utility-types)                               | Object utility types                                | Implemented         |
 | [S4](#s4-tooling-ci-and-publishing)                          | Tooling, CI and publishing                          | Implemented         |
-| [S5](#s5-readme-samples-as-tests)                            | README samples as tests                             | Draft, not approved |
+| [S5](#s5-readme-samples-as-tests)                            | README samples as tests                             | Superseded by S9.2  |
 | [S6](#s6-branch-protection-on-master)                        | Branch protection on `master`                       | Draft, not approved |
 | [S7](#s7-first-stable-release)                               | First stable release                                | Draft, not approved |
 | [S8](#s8-documentation-review-and-code-style-as-a-hard-rule) | Documentation review, and code style as a hard rule | Implemented         |
+| [S9](#s9-documentation-with-showroom)                        | Documentation with `showroom`                       | Approved            |
 
 ## S1. Assertion types
 
@@ -47,7 +48,7 @@ How the [specification](./SPEC.md) is built. Drafted on 2026-11-04 from the repo
 ## S5. README samples as tests
 
 - **Goal:** SPEC › Quality. At the moment, `README.md` samples are verified by hand against `tsc`. This segment makes that verification automatic, adapting the idea of the sibling `ts-std` repository's `src/readme.spec.ts`, whose `describe`/`it` tree mirrors the README's headings.
-- **Status:** draft. The steps get planned once the open points below are settled.
+- **Status:** superseded by S9.2 (approved 2026-11-15), which makes the README samples `ts` showcases that `ci:showroom` type checks. Kept so the mirrored test file approach below isn't reopened without new information.
 - **Open points:**
   - The file's name and location, e.g. `src/readme.test-d.ts`. A new name must match the `unit` project's globs and the build's `exclude`.
   - How to keep it in sync with `README.md`: by hand, with a mirroring convention, or by extracting the samples.
@@ -82,6 +83,21 @@ How the [specification](./SPEC.md) is built. Drafted on 2026-11-04 from the repo
   - `CONTRIBUTE.md`: the claim that issue templates exist is dropped.
   - `SPEC.md`: the Conventions link now points to `WORKFLOW.custom.md` › Code style.
 - **Documentation and tests:** the documents above. No behaviour changed, so the existing tests cover it; the test files only gained comments and import extensions.
+
+## S9. Documentation with `showroom`
+
+- **Goal:** your request of 2026-11-14 to use `@ofzza/showroom` (a devDependency since the uncommitted change on branch `tsshowcase`: `showroom.json`, `.github/workflows/showroom.yml`, the `showroom` and `ci:showroom` scripts) to improve the documentation. You chose P1 to P6 on 2026-11-15. S9.2 replaces the approach drafted in S5.
+- **Status:** approved 2026-11-15. S9.1 and S9.5 are implemented (S9.5 ahead of order, on your request). Child segments:
+  - **S9.1. Document the showroom setup (P1).** `README.md` › Development: `npm run showroom`, and `ci:showroom` in the `npm run ci` list. `AGENTS.md`: Layout (`showroom.json`, the gitignored `showroom/` output, `.github/workflows/showroom.yml`), Commands, Continuous integration (the second workflow: Pages, `master` only) and Gotchas (`ci:showroom` resolves `@ofzza/tsstd` through `exports` to `dist/`, so it relies on `ci:build` running first; `showroom` is an alpha; the `github-pages` environment must allow `master`). `CONTRIBUTE.md`: preview documentation changes with `npm run showroom`. S4 lists the showroom in its scope. Committed together with the setup.
+  - **S9.2. README samples as type-checked `ts` showcases (P2).** First a spike in `.workflow/.temp/spike-showroom-samples/`, on its own go-ahead: one converted block, then `showroom check --showcases` must pass, fail on a wrong assertion, and fail on an unused `@ts-expect-error`. Then every assertion sample in `README.md` is marked ` ```ts showcase=ts `, each block gets its own `import type` line, and every "This will fail at compile time" line becomes a `// @ts-expect-error <reason>` line above the assertion (your choice). The shell blocks and the Vitest sample stay plain code blocks.
+  - **S9.3. Showcases with something to show (P3).** A type-only showcase logs nothing and shows an empty frame. Per module, a showcase logs runtime values typed by the utility types (e.g. `const first: ArrayHead<typeof point> = point[0]; console.log(first)`). Its form is settled after you look at S9.2 in `npm run showroom`.
+  - **S9.4. Source and test links (P4).** Each module section in `README.md` gets a line linking `src/<module>/index.ts` and `src/<module>/index.test-d.ts` by relative path, opening in the showroom's code sidebar; the "Writing type level tests" link to the test suite becomes relative again.
+  - **S9.5. Homepage and `PUBLISH.md` (P5, P6).** `package.json` `homepage` becomes `https://ofzza.github.io/tsstd/`. `showroom.json` adds `"documentation": ["PUBLISH.md"]`.
+- **Open points:**
+  - [x] S9.2 makes the manual "Verifying README samples" procedure automatic for showcase blocks. `AGENTS.md` › Verifying README samples and SPEC › Quality are updated with it. Resolved: you chose to reword the `WORKFLOW.custom.md` rule in S9.2: README samples are `ts` showcases checked by `ci:showroom`, and samples that can't be (shell, the Vitest sample) are still checked by hand against `tsc`.
+  - [ ] S9.4: S8 made the test-suite link absolute because npmjs.com may not resolve relative links. Check how the published README renders a relative link before S9.4 is implemented.
+  - [x] S5 is replaced by S9.2. Resolved: you chose to mark S5 superseded, and keep it.
+- **Documentation and tests:** S9.1 is documentation only. S9.2 turns the README samples into tests run by `ci:showroom`; the break-one-and-revert check from `AGENTS.md` › Testing applies to them. S9.3 and S9.4 change only `README.md`. S9.5 changes `package.json` and `showroom.json`, with `AGENTS.md` updated where it describes them.
 
 ## Known open issues
 
