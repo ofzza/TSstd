@@ -3,8 +3,8 @@
 ## Next session: start here
 
 - **Stage:** planning.
-- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1 and S9.5 are implemented and committed on branch `tsshowcase` (not pushed). The draft segments S6 and S7 wait for approval.
-- **Next step:** a go-ahead for the S9.2 spike.
+- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2 and S9.5 are implemented and committed on branch `tsshowcase` (not pushed). The draft segments S6 and S7 wait for approval.
+- **Next step:** S9.3 (a type-only showcase shows an empty frame about 3 lines high).
 
 ## Open questions
 
@@ -14,7 +14,6 @@
 ## Waiting on me
 
 - Approval of each draft plan segment (S6, S7).
-- A go-ahead for the S9.2 spike.
 - Whether to push `tsshowcase`.
 
 ## Running
@@ -32,3 +31,6 @@ None.
 - 2026-11-15: S9 approved ("Approve S9"), with the `WORKFLOW.custom.md` README-samples rule to be reworded in S9.2 ("Reword it") and S5 marked superseded by S9.2 ("Mark superseded").
 - 2026-11-15: S9.1 implemented: the `showroom` setup documented in `README.md`, `AGENTS.md`, `CONTRIBUTE.md` and SPEC › Quality.
 - 2026-11-15: S9.5 implemented on your request ("S9.5. Commit, don't push"): `homepage` points at the showroom, and `PUBLISH.md` is a showroom page. S9.1 and S9.5 approved and committed together.
+- 2026-11-15: S9.2 spike run ("Go ahead"): README samples as `ts` showcases work as planned; results in PLAN › S9.2.
+- 2026-11-15: You looked at the spike's showroom: a type-only showcase is an empty frame about 3 lines high, and the code with `@ts-expect-error` lines reads well as documentation. S9.2 implemented: README samples are `ts` showcases, the `WORKFLOW.custom.md` README-samples rule reworded as you asked.
+- 2026-11-15: S9.2 checkpoint approved ("Approve and commit"); the spike folder deleted.

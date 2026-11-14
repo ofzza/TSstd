@@ -37,7 +37,7 @@ These are set out in [AGENTS.md › Project](../AGENTS.md#project):
 ### Quality
 
 - Every module has type-only tests in a `*.test-d.ts` file beside it, which assert results with `src/assert`. See [AGENTS.md › Testing](../AGENTS.md#testing).
-- `README.md` code samples are checked against `tsc`. See [AGENTS.md › Verifying README samples](../AGENTS.md#verifying-readme-samples).
+- `README.md` TypeScript samples are `ts` showcases type checked by `ci:showroom`; those that can't be showcases are checked against `tsc` by hand. See [AGENTS.md › Verifying README samples](../AGENTS.md#verifying-readme-samples).
 - CI (`npm run ci`, which runs build, the showroom check, ESLint, Prettier and the tests) passes on Node 22 and 24. See [AGENTS.md › Continuous integration](../AGENTS.md#continuous-integration).
 - Releases follow [PUBLISH.md](../PUBLISH.md).
 

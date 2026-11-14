@@ -124,7 +124,13 @@ After adding or changing type-level assertions, sanity-check them: break one del
 
 ### Verifying README samples
 
-`README.md` code samples are annotated `// This will work` / `// This will fail at compile time`. Those claims are checkable: extract the ```ts blocks into `./.workflow/.temp/<topic>/`, point the import at `../../../src/assert/index.js`, and run `tsc --noEmit` — every "will work" line must compile and every "will fail" line must error. Do this whenever a sample or an exported type changes.
+Every TypeScript sample in `README.md` is a `ts` showcase (` ```ts showcase=ts `), which `ci:showroom` (`showroom check --showcases`) type checks with this repository's TypeScript and root `tsconfig.json`, resolving `@ofzza/tsstd` through `exports` to `dist/`. A type error fails the check at its README line. So:
+
+- Lines that must compile are written plainly (annotated `// This will work`). A line that must fail is preceded by `// @ts-expect-error <reason>`; an unused one is itself an error (TS2578), so a sample that stops failing fails the check too.
+- Each block is its own module and needs its own `import type { … } from '@ofzza/tsstd';` (TS2304 otherwise).
+- Run `npm run build` before `npx showroom check --showcases` when checking by hand, or the samples type check against a stale `dist/`. `npm run ci` builds first.
+- A sample that can't be a showcase stays a plain code block and is verified by hand: currently the Vitest sample in "Writing type level tests", which imports `vitest` and can't run in a browser frame. Extract it into `./.workflow/.temp/<topic>/` and run `tsc --noEmit` on it.
+- Break one sample deliberately after changing samples, confirm `ci:showroom` fails, and revert, as for the test suite.
 
 ## Code style
 

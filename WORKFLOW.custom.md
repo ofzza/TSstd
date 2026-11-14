@@ -44,7 +44,7 @@ Concrete triggers:
 | establishes a new convention, or hits a new gotcha              | [Code style](#code-style-hard-rule) below / [Gotchas](./AGENTS.md#gotchas-and-known-issues) in `AGENTS.md`           |
 | resolves one of the known issues in `AGENTS.md`                 | remove it from [Gotchas](./AGENTS.md#gotchas-and-known-issues) in `AGENTS.md`                                        |
 
-Any code sample added to `README.md` must be verified against `tsc` before being committed — see [Verifying README samples](./AGENTS.md#verifying-readme-samples) in `AGENTS.md`.
+Every TypeScript sample in `README.md` must be a `ts` showcase, type checked by `ci:showroom` (part of `npm run ci`); a sample that can't be one (e.g. one importing `vitest`) must be verified against `tsc` by hand before being committed — see [Verifying README samples](./AGENTS.md#verifying-readme-samples) in `AGENTS.md`.
 
 ## Code style (hard rule)
 
