@@ -3,8 +3,8 @@
 ## Next session: start here
 
 - **Stage:** planning.
-- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2 and S9.5 are implemented and committed on branch `tsshowcase` (not pushed). The draft segments S6 and S7 wait for approval.
-- **Next step:** S9.3 (a type-only showcase shows an empty frame about 3 lines high).
+- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2, S9.3 and S9.5 are implemented and committed on branch `tsshowcase` (not pushed). The draft segments S6 and S7 wait for approval.
+- **Next step:** S9.4 (check how npmjs.com renders relative links first).
 
 ## Open questions
 
@@ -34,3 +34,5 @@ None.
 - 2026-11-15: S9.2 spike run ("Go ahead"): README samples as `ts` showcases work as planned; results in PLAN › S9.2.
 - 2026-11-15: You looked at the spike's showroom: a type-only showcase is an empty frame about 3 lines high, and the code with `@ts-expect-error` lines reads well as documentation. S9.2 implemented: README samples are `ts` showcases, the `WORKFLOW.custom.md` README-samples rule reworded as you asked.
 - 2026-11-15: S9.2 checkpoint approved ("Approve and commit"); the spike folder deleted.
+- 2026-11-15: S9.3 implemented as you asked ("Make each one log out: …"): every README showcase logs a placeholder line until `showroom` handles showcases with no output; recorded as Known open issue K2.
+- 2026-11-15: S9.3 checkpoint approved ("Approve and commit").

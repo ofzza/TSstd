@@ -55,6 +55,8 @@ import type { AssertTypeEquality } from '@ofzza/tsstd';
 const stringIsString: AssertTypeEquality<string, string> = true; // This will work
 // @ts-expect-error This will fail at compile time
 const stringIsNumber: AssertTypeEquality<string, number> = true;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 ... or, without declaring a variable for every check:
@@ -65,6 +67,8 @@ import type { AssertTypeEquality } from '@ofzza/tsstd';
 true satisfies AssertTypeEquality<string, string>; // This will work
 // @ts-expect-error This will fail at compile time
 true satisfies AssertTypeEquality<string, number>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 Note that an assertion has to be consumed by assigning `true` to it. Checking it with a generic constraint will silently accept everything, because `never` satisfies every constraint there is:
@@ -75,6 +79,8 @@ import type { AssertTypeEquality } from '@ofzza/tsstd';
 // This looks like it checks the assertion, but it doesn't - `never extends true` is `true`, so a failing assertion passes just as happily as a passing one
 const assertTrue = <T extends true>(): void => {};
 assertTrue<AssertTypeEquality<string, number>>(); // This will NOT fail at compile time, even though the two types are not equal
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 ---
@@ -108,6 +114,8 @@ true satisfies AssertTypeEquality<boolean, true>;
 true satisfies AssertTypeEquality<{ a: string }, { readonly a: string }>;
 // @ts-expect-error A tuple is not an array
 true satisfies AssertTypeEquality<[string], string[]>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 ## `AssertTypeInequality<A, B>`
@@ -131,6 +139,8 @@ true satisfies AssertTypeInequality<string, string>;
 true satisfies AssertTypeInequality<never, never>;
 // @ts-expect-error Member order does not make two unions different
 true satisfies AssertTypeInequality<'a' | 'b', 'b' | 'a'>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 ## `AssertTypeAssignable<A, B>`
@@ -158,6 +168,8 @@ true satisfies AssertTypeAssignable<unknown, string>;
 true satisfies AssertTypeAssignable<'a' | 'b', 'a'>;
 // @ts-expect-error A readonly array is not assignable to a mutable one
 true satisfies AssertTypeAssignable<readonly string[], string[]>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 ## `AssertTypeUnassignable<A, B>`
@@ -182,6 +194,8 @@ true satisfies AssertTypeUnassignable<any, string>;
 true satisfies AssertTypeUnassignable<never, string>;
 // @ts-expect-error Property modifiers are invisible to assignability
 true satisfies AssertTypeUnassignable<{ readonly a: string }, { a: string }>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 ## Equality vs. assignability
@@ -253,6 +267,8 @@ true satisfies AssertTypeEquality<ArrayIsEmpty<[1?]>, boolean>; // This will wor
 true satisfies AssertTypeEquality<ArrayIsEmpty<[] | [1]>, boolean>; // This will work, and so may a union of the two
 // @ts-expect-error This will fail at compile time
 true satisfies AssertTypeEquality<ArrayIsEmpty<string[]>, false>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 ## `ArrayHead<TArray>`
@@ -270,6 +286,8 @@ true satisfies AssertTypeEquality<ArrayHead<string[]>, string | undefined>; // T
 true satisfies AssertTypeEquality<ArrayHead<[...string[], 1]>, string | 1>; // This will work, the head may be any of the elements
 // @ts-expect-error This will fail at compile time
 true satisfies AssertTypeEquality<ArrayHead<string[]>, string>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 Note that the head of `[never]` is `never` as well, and cannot be told apart from the head of `[]` - use `ArrayIsEmpty` when the difference matters.
@@ -290,6 +308,8 @@ true satisfies AssertTypeEquality<ArrayTail<[1?, 2?]>, [2?]>; // This will work
 true satisfies AssertTypeEquality<ArrayTail<string[]>, string[]>; // This will work, the tail of a plain array is the same plain array
 // @ts-expect-error This will fail at compile time
 true satisfies AssertTypeEquality<ArrayTail<readonly [1, 2, 3]>, [2, 3]>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 The tail of a tuple starting with a rest element, like `[...string[], 1]`, is widened to a plain array of all its element types, `(string | 1)[]`.
@@ -316,6 +336,8 @@ true satisfies AssertTypeEquality<ObjectIsEmpty<Record<string, number>>, boolean
 true satisfies AssertTypeEquality<ObjectIsEmpty<{} | { a: 1 }>, boolean>; // This will work, and so may a union of the two
 // @ts-expect-error This will fail at compile time
 true satisfies AssertTypeEquality<ObjectIsEmpty<{ a?: 1 }>, true>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 Note that `object` has no known keys either, and resolves to `true` just like `{}`.
@@ -335,6 +357,8 @@ true satisfies AssertTypeEquality<ObjectKeys<{ a: 1; b: 2; 0: 3 }>['length'], 3>
 true satisfies AssertTypeEquality<ObjectKeys<Record<string, number>>, [string]>; // This will work, an index signature contributes its key type
 // @ts-expect-error This will fail at compile time, the keys are a tuple and not a union
 true satisfies AssertTypeEquality<ObjectKeys<{ a: 1 }>, 'a'>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 Note that TypeScript reports the keys of a written out `string` index signature as `string | number`, so `ObjectKeys<{ [key: string]: 1 }>` holds both a `string` and a `number` element, while `ObjectKeys<Record<string, 1>>` is just `[string]`.
@@ -356,6 +380,8 @@ true satisfies AssertTypeEquality<ObjectValues<Point>[0], Point[ObjectKeys<Point
 true satisfies AssertTypeEquality<ObjectValues<Point>[1], Point[ObjectKeys<Point>[1]]>; // This will work
 // @ts-expect-error This will fail at compile time
 true satisfies AssertTypeEquality<ObjectValues<{ a?: 1 }>, [1]>;
+
+console.log('Awaiting update to showroom CLI: output markdown when no showcase DOM or console output');
 ```
 
 # Development
