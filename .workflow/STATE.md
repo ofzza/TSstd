@@ -3,7 +3,7 @@
 ## Next session: start here
 
 - **Stage:** planning.
-- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2, S9.3 and S9.5 are implemented, committed and pushed (branch `showroom`, tracking `origin/tsshowcase`). S10 (`showroom` alpha.2) is implemented and committed. The draft segments S6 and S7 wait for approval.
+- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2, S9.3 and S9.5 are implemented, committed and pushed (branch `showroom`, pushed to and tracking `origin/showroom`; `origin/tsshowcase` holds the S9 commits only). S10 (`showroom` alpha.2) is implemented and committed. The draft segments S6 and S7 wait for approval.
 - **Next step:** S9.4 (check how npmjs.com renders relative links first).
 
 ## Open questions
