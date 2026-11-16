@@ -13,8 +13,8 @@ TSstd — a TypeScript standard library of commonly used types, utility types an
 - **ESM only** (`"type": "module"`). The entry point is the `exports` map (`.` → `types: ./dist/index.d.ts`, `default: ./dist/index.js`, plus `./package.json`); `main` and `types` mirror it for older tooling.
 - **Only `dist/` is published** (`files: ["dist"]`; npm adds `README.md`, `LICENSE` and `package.json` itself). `sideEffects: false`, and `publishConfig.access: public` because scoped packages otherwise publish as restricted.
 - **Currently types-only.** Nothing in `src/` emits runtime code, so `dist/assert/index.js` is just `export {}`. The first runtime export will change assumptions in several places — re-read [Gotchas](#gotchas-and-known-issues) when adding one.
-- Toolchain last verified against: Node 24.15, npm 11.12, TypeScript 5.9.3, Vitest 5.1.0, ESLint 10.11, Prettier 3.9, showroom 0.1.0-alpha.1.
-- **Documentation is also published as a showroom**, built by [`@ofzza/showroom`](https://www.npmjs.com/package/@ofzza/showroom) (a devDependency) from `README.md`, `CONTRIBUTE.md`, `LICENSE` and `PUBLISH.md`, to GitHub Pages; `package.json`'s `homepage` points there at [ofzza.github.io/tsstd](https://ofzza.github.io/tsstd/).
+- Toolchain last verified against: Node 24.15, npm 11.12, TypeScript 5.9.3, Vitest 5.1.0, ESLint 10.11, Prettier 3.9, showroom 0.1.0-alpha.2.
+- **Documentation is also published as a showroom**, built by [`@ofzza/showroom`](https://www.npmjs.com/package/@ofzza/showroom) (a devDependency) from `README.md`, `CONTRIBUTE.md`, `LICENSE` and `PUBLISH.md`, to GitHub Pages; `package.json`'s `homepage` points there at [ofzza.github.io/tsstd](https://ofzza.github.io/tsstd/). Its navigation is set in `showroom.json`: the README's top-level sections are linked by anchor (`/#type-assertions`, …), so renaming one of those headings means updating `navigation` too (`showroom check` warns about an anchor that leads nowhere).
 
 ## Layout
 
@@ -34,7 +34,7 @@ tsconfig.json              Type checking config. Includes all .ts/.tsx (tests to
 tsconfig.build.json        Build config. Extends tsconfig.json, emits to dist/ with declarations, EXCLUDES test files (*.test / *.spec / *.test-d / *.spec-d)
 vite.config.ts             Two Vitest projects: unit, and debug (only with VITEST_DEBUG=1)
 eslint.config.js           ESLint flat config (typescript-eslint + prettier compat, ignores what .gitignore ignores)
-showroom.json              showroom configuration: the typescript stack adapter, ignoring .workflow/, adding PUBLISH.md as a page
+showroom.json              showroom configuration: the typescript stack adapter, ignoring .workflow/, PUBLISH.md as a page, ts showcases shown as source, the navigation
 showroom/                  showroom build output (`npx showroom build`), gitignored
 .prettierrc                Prettier config
 .prettierignore            Paths Prettier skips (dist, node_modules)
@@ -128,6 +128,7 @@ Every TypeScript sample in `README.md` is a `ts` showcase (` ```ts showcase=ts `
 
 - Lines that must compile are written plainly (annotated `// This will work`). A line that must fail is preceded by `// @ts-expect-error <reason>`; an unused one is itself an error (TS2578), so a sample that stops failing fails the check too.
 - Each block is its own module and needs its own `import type { … } from '@ofzza/tsstd';` (TS2304 otherwise).
+- `showroom.json` sets `"showcaseViews": { "ts": "source" }`, so the showroom shows each sample as a code block under its status marks (`build ✓`, `type check ✓`), and never loads its page. Samples log nothing; a sample that should be run and show its console sets `view=` on its marker (e.g. `view=source,console`).
 - Run `npm run build` before `npx showroom check --showcases` when checking by hand, or the samples type check against a stale `dist/`. `npm run ci` builds first.
 - A sample that can't be a showcase stays a plain code block and is verified by hand: currently the Vitest sample in "Writing type level tests", which imports `vitest` and can't run in a browser frame. Extract it into `./.workflow/.temp/<topic>/` and run `tsc --noEmit` on it.
 - Break one sample deliberately after changing samples, confirm `ci:showroom` fails, and revert, as for the test suite.
@@ -157,7 +158,7 @@ The code style is a workflow hard rule: see [Code style](./WORKFLOW.custom.md#co
 - **ESLint's typed-linting block sets `tsconfigRootDir: import.meta.dirname`**, the directory `project: './tsconfig.json'` is resolved against. Left unset, typescript-eslint 8 infers it: reading `ts.configs.*` records the calling config file's directory as a candidate, falling back to `process.cwd()` with no candidate and throwing "multiple candidate TSConfigRootDirs" with more than one (e.g. an editor loading several workspace configs in one process). Setting it explicitly makes linting independent of that heuristic and of the working directory.
 - `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json`. Only `extensions.json` and `launch.json` are currently committed; any other `.vscode/` file must be re-included there before it can be.
 - **`ci:showroom` relies on `ci:build` running first.** `npm-run-all ci:*` runs the scripts in `package.json` order, and a `ts` showcase imports `@ofzza/tsstd` by name, which resolves through `exports` to `dist/`. Keep `ci:build` before `ci:showroom`, or run `npm run build` before `npx showroom check --showcases`.
-- **`showroom` is an alpha** (`0.1.0-alpha.1`): its configuration, showcase markers and command line may change in any release. Re-check `showroom.json`, `ci:showroom` and `.github/workflows/showroom.yml` against its README when upgrading it.
+- **`showroom` is an alpha** (`0.1.0-alpha.2`): its configuration, showcase markers and command line may change in any release. Re-check `showroom.json`, `ci:showroom` and `.github/workflows/showroom.yml` against its README when upgrading it.
 - **`showroom build` empties its output folder** (`showroom/`) before every build, refusing to if it holds anything but an earlier build's `.showroom` marker. Never point `outDir` at a folder with other content.
 - **`*.gitignore.*` files and `*.gitignore/` directories are local-only** (e.g. `TODO.gitignore.md`), a convention for keeping scratch files next to the code. `.gitignore` ignores them, so never commit them. They are for your own local notes: an agent's working files still go under `./.workflow/.temp/<topic>/` (see [WORKFLOW.md](./WORKFLOW.md) › "Working files").
 

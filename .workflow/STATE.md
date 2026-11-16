@@ -3,7 +3,7 @@
 ## Next session: start here
 
 - **Stage:** planning.
-- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2, S9.3 and S9.5 are implemented and committed on branch `tsshowcase` (not pushed). The draft segments S6 and S7 wait for approval.
+- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2, S9.3 and S9.5 are implemented, committed and pushed (branch `showroom`, tracking `origin/tsshowcase`). S10 (`showroom` alpha.2) is implemented and committed. The draft segments S6 and S7 wait for approval.
 - **Next step:** S9.4 (check how npmjs.com renders relative links first).
 
 ## Open questions
@@ -14,7 +14,6 @@
 ## Waiting on me
 
 - Approval of each draft plan segment (S6, S7).
-- Whether to push `tsshowcase`.
 
 ## Running
 
@@ -36,3 +35,5 @@ None.
 - 2026-11-15: S9.2 checkpoint approved ("Approve and commit"); the spike folder deleted.
 - 2026-11-15: S9.3 implemented as you asked ("Make each one log out: …"): every README showcase logs a placeholder line until `showroom` handles showcases with no output; recorded as Known open issue K2.
 - 2026-11-15: S9.3 checkpoint approved ("Approve and commit").
+- 2026-11-16: S10 approved ("Approve S10 as described"), with the `source` view ("source") and a custom navigation ("Custom navigation"), and implemented; K2 resolved.
+- 2026-11-16: S10 approved and committed (your `/ig-git commit --auto --push`), after dropping the npm and GitHub links from the navigation at your request.

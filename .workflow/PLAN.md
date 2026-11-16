@@ -13,6 +13,7 @@ How the [specification](./SPEC.md) is built. Drafted on 2026-11-04 from the repo
 | [S7](#s7-first-stable-release)                               | First stable release                                | Draft, not approved |
 | [S8](#s8-documentation-review-and-code-style-as-a-hard-rule) | Documentation review, and code style as a hard rule | Implemented         |
 | [S9](#s9-documentation-with-showroom)                        | Documentation with `showroom`                       | Approved            |
+| [S10](#s10-showroom-alpha2)                                  | `showroom` alpha.2                                  | Approved            |
 
 ## S1. Assertion types
 
@@ -101,10 +102,21 @@ How the [specification](./SPEC.md) is built. Drafted on 2026-11-04 from the repo
   - [x] S5 is replaced by S9.2. Resolved: you chose to mark S5 superseded, and keep it.
 - **Documentation and tests:** S9.1 is documentation only. S9.2 turns the README samples into tests run by `ci:showroom`; the break-one-and-revert check from `AGENTS.md` › Testing applies to them. S9.3 and S9.4 change only `README.md`. S9.5 changes `package.json` and `showroom.json`, with `AGENTS.md` updated where it describes them.
 
+## S10. `showroom` alpha.2
+
+- **Goal:** your request of 2026-11-16 to update `@ofzza/showroom` to its latest version (0.1.0-alpha.2) and use its new features in the documentation.
+- **Status:** approved 2026-11-16, implemented.
+- **Steps:**
+  - Upgrade `@ofzza/showroom` to `^0.1.0-alpha.2`.
+  - `showroom.json`: `"showcaseViews": { "ts": "source" }` (your choice over `markdown` and the default `source,console`), so every README sample is shown as a code block under its `build` and `type check` status marks, its page never loaded; and a `navigation` (your choice): Home, a Library group (Type assertions, Arrays, Objects, by README anchor), and a Project group (Development, Contributing, Publishing, License). Links to npm and GitHub were dropped from it at your request.
+  - `README.md`: the 13 placeholder `console.log` lines removed, resolving K2.
+  - `AGENTS.md`: toolchain line and alpha gotcha at alpha.2; the navigation and its README anchors under Project; `showroom.json` in Layout; the `source` view under Verifying README samples. SPEC › Pitfalls at alpha.2.
+- **Documentation and tests:** the documents above. The README samples stay type checked by `ci:showroom`; their views don't change what is checked.
+
 ## Known open issues
 
 - **K1. Preparing for the first runtime export.** This is deferred: the specification currently covers only existing, types-only work, and no runtime export has been asked for. It takes the pitfall "The first runtime export breaks types-only assumptions", and is picked up when a runtime export enters the specification.
-- **K2. The README showcases' placeholder log line.** Each README showcase logs "Awaiting update to showroom CLI: …" (S9.3), which readers on GitHub and npm see too. Remove it once `showroom` shows something for a showcase with no DOM and no console output.
+- [x] **K2. The README showcases' placeholder log line.** Each README showcase logs "Awaiting update to showroom CLI: …" (S9.3), which readers on GitHub and npm see too. Remove it once `showroom` shows something for a showcase with no DOM and no console output. Resolved by S10: `showroom` alpha.2 shows `ts` showcases by their `source` view, and the line was removed.
 
 ## Review notes
 

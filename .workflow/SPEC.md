@@ -65,7 +65,7 @@ Rule 5 is abbreviated on purpose (decided 2026-11-04); the full text is in `AGEN
 - **The Vitest `typecheck.spawnTimeout` workaround** is pinned against a Vitest 5 bug (checked up to 5.1.0). A Vitest upgrade may make it unnecessary, or break it. Taken by: S4 (handled).
 - **A workflow alone does not block merges.** Requiring CI before merging into `master` is a GitHub repository setting, outside this repository. Taken by: S6.
 - **Only `0.1.0-alpha.1` has been published.** No stable version exists yet, so semver promises to consumers have not started. Taken by: S7.
-- **`@ofzza/showroom` is an alpha (`0.1.0-alpha.1`).** Its showcase markers, type checking and CLI may change in any release, and `ci:showroom` and the Pages workflow depend on them. Taken by: S9.
+- **`@ofzza/showroom` is an alpha (`0.1.0-alpha.2`).** Its showcase markers, type checking and CLI may change in any release, and `ci:showroom` and the Pages workflow depend on them. Taken by: S9.
 
 ## Open points
 

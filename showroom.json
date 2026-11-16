@@ -1,5 +1,51 @@
 {
   "stack": "typescript",
   "ignore": [".workflow/*"],
-  "documentation": ["PUBLISH.md"]
+  "documentation": ["PUBLISH.md"],
+  "showcaseViews": {
+    "ts": "source"
+  },
+  "navigation": [
+    {
+      "path": "/"
+    },
+    {
+      "title": "Library",
+      "items": [
+        {
+          "title": "Type assertions",
+          "path": "/#type-assertions"
+        },
+        {
+          "title": "Arrays",
+          "path": "/#arrays"
+        },
+        {
+          "title": "Objects",
+          "path": "/#objects"
+        }
+      ]
+    },
+    {
+      "title": "Project",
+      "items": [
+        {
+          "title": "Development",
+          "path": "/#development"
+        },
+        {
+          "title": "Contributing",
+          "path": "CONTRIBUTE.md"
+        },
+        {
+          "title": "Publishing",
+          "path": "PUBLISH.md"
+        },
+        {
+          "title": "License",
+          "path": "LICENSE"
+        }
+      ]
+    }
+  ]
 }
