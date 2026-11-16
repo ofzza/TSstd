@@ -39,3 +39,4 @@ None.
 - 2026-11-16: S10 approved and committed (your `/ig-git commit --auto --push`), after dropping the npm and GitHub links from the navigation at your request.
 - 2026-11-16: At your request, Publishing dropped from the showroom's navigation, and `PUBLISH.md` no longer a showroom page ("Stop making it a page").
 - 2026-11-16: At your request, the showroom navigation's Project group ungrouped: Development, Contributing and License at the top level.
+- 2026-11-16: Released `0.1.0-alpha.2` to npm (your `/ig-repo publish`), published under the `alpha` dist-tag, then set as `latest` at your request.
