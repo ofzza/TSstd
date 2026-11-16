@@ -37,3 +37,5 @@ None.
 - 2026-11-15: S9.3 checkpoint approved ("Approve and commit").
 - 2026-11-16: S10 approved ("Approve S10 as described"), with the `source` view ("source") and a custom navigation ("Custom navigation"), and implemented; K2 resolved.
 - 2026-11-16: S10 approved and committed (your `/ig-git commit --auto --push`), after dropping the npm and GitHub links from the navigation at your request.
+- 2026-11-16: At your request, Publishing dropped from the showroom's navigation, and `PUBLISH.md` no longer a showroom page ("Stop making it a page").
+- 2026-11-16: At your request, the showroom navigation's Project group ungrouped: Development, Contributing and License at the top level.

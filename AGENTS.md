@@ -14,7 +14,7 @@ TSstd — a TypeScript standard library of commonly used types, utility types an
 - **Only `dist/` is published** (`files: ["dist"]`; npm adds `README.md`, `LICENSE` and `package.json` itself). `sideEffects: false`, and `publishConfig.access: public` because scoped packages otherwise publish as restricted.
 - **Currently types-only.** Nothing in `src/` emits runtime code, so `dist/assert/index.js` is just `export {}`. The first runtime export will change assumptions in several places — re-read [Gotchas](#gotchas-and-known-issues) when adding one.
 - Toolchain last verified against: Node 24.15, npm 11.12, TypeScript 5.9.3, Vitest 5.1.0, ESLint 10.11, Prettier 3.9, showroom 0.1.0-alpha.2.
-- **Documentation is also published as a showroom**, built by [`@ofzza/showroom`](https://www.npmjs.com/package/@ofzza/showroom) (a devDependency) from `README.md`, `CONTRIBUTE.md`, `LICENSE` and `PUBLISH.md`, to GitHub Pages; `package.json`'s `homepage` points there at [ofzza.github.io/tsstd](https://ofzza.github.io/tsstd/). Its navigation is set in `showroom.json`: the README's top-level sections are linked by anchor (`/#type-assertions`, …), so renaming one of those headings means updating `navigation` too (`showroom check` warns about an anchor that leads nowhere).
+- **Documentation is also published as a showroom**, built by [`@ofzza/showroom`](https://www.npmjs.com/package/@ofzza/showroom) (a devDependency) from `README.md`, `CONTRIBUTE.md` and `LICENSE`, to GitHub Pages; `package.json`'s `homepage` points there at [ofzza.github.io/tsstd](https://ofzza.github.io/tsstd/). Its navigation is set in `showroom.json`: the README's top-level sections are linked by anchor (`/#type-assertions`, …), so renaming one of those headings means updating `navigation` too (`showroom check` warns about an anchor that leads nowhere).
 
 ## Layout
 
@@ -34,7 +34,7 @@ tsconfig.json              Type checking config. Includes all .ts/.tsx (tests to
 tsconfig.build.json        Build config. Extends tsconfig.json, emits to dist/ with declarations, EXCLUDES test files (*.test / *.spec / *.test-d / *.spec-d)
 vite.config.ts             Two Vitest projects: unit, and debug (only with VITEST_DEBUG=1)
 eslint.config.js           ESLint flat config (typescript-eslint + prettier compat, ignores what .gitignore ignores)
-showroom.json              showroom configuration: the typescript stack adapter, ignoring .workflow/, PUBLISH.md as a page, ts showcases shown as source, the navigation
+showroom.json              showroom configuration: the typescript stack adapter, ignoring .workflow/, ts showcases shown as source, the navigation
 showroom/                  showroom build output (`npx showroom build`), gitignored
 .prettierrc                Prettier config
 .prettierignore            Paths Prettier skips (dist, node_modules)

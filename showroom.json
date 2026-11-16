@@ -1,7 +1,6 @@
 {
   "stack": "typescript",
   "ignore": [".workflow/*"],
-  "documentation": ["PUBLISH.md"],
   "showcaseViews": {
     "ts": "source"
   },
@@ -27,25 +26,16 @@
       ]
     },
     {
-      "title": "Project",
-      "items": [
-        {
-          "title": "Development",
-          "path": "/#development"
-        },
-        {
-          "title": "Contributing",
-          "path": "CONTRIBUTE.md"
-        },
-        {
-          "title": "Publishing",
-          "path": "PUBLISH.md"
-        },
-        {
-          "title": "License",
-          "path": "LICENSE"
-        }
-      ]
+      "title": "Development",
+      "path": "/#development"
+    },
+    {
+      "title": "Contributing",
+      "path": "CONTRIBUTE.md"
+    },
+    {
+      "title": "License",
+      "path": "LICENSE"
     }
   ]
 }
