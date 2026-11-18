@@ -3,8 +3,8 @@
 ## Next session: start here
 
 - **Stage:** planning.
-- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2, S9.3 and S9.5 are implemented, committed and pushed (branch `showroom`, pushed to and tracking `origin/showroom`; `origin/tsshowcase` holds the S9 commits only). S10 (`showroom` alpha.2) is implemented and committed. S11 (`showroom` alpha.3) is implemented and committed, not pushed; its split Pages workflow first runs on the next push to `master`. The draft segments S6 and S7 wait for approval.
-- **Next step:** S9.4 (check how npmjs.com renders relative links first). 
+- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2, S9.3 and S9.5 are implemented, committed and pushed (branch `showroom`, pushed to and tracking `origin/showroom`; `origin/tsshowcase` holds the S9 commits only). S10 (`showroom` alpha.2) is implemented and committed. S11 (`showroom` alpha.3) is implemented, committed and pushed to `develop`; its split Pages workflow first runs on the next push to `master`. The draft segments S6 and S7 wait for approval.
+- **Next step:** S9.4 (check how npmjs.com renders relative links first).
 
 ## Open questions
 
@@ -18,7 +18,7 @@
 
 ## Running
 
-None.
+- `npm run showroom` (showroom serve), at http://localhost:5174/, for your review.
 
 ## History
 
@@ -45,3 +45,4 @@ None.
 - 2026-11-18: Drafted S11 (`showroom` alpha.3) at your request, after testing alpha.3 in a copy of the repository; its choices settled: `--trust` always in `ci:showroom` and `npm run showroom`, the Pages workflow split into build and deploy jobs, `persist-credentials: false` in `ci.yml`.
 - 2026-11-18: S11 approved ("Approve S11"), and implemented.
 - 2026-11-18: S11 checkpoint approved ("Approve and commit").
+- 2026-11-18: Stopped after `515300c` committed `.workflow/STATE.md` unformatted (a trailing space); resumed at your answer ("Resume, follow-up commit"), fixed in a follow-up commit.
