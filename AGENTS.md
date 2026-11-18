@@ -13,7 +13,7 @@ TSstd — a TypeScript standard library of commonly used types, utility types an
 - **ESM only** (`"type": "module"`). The entry point is the `exports` map (`.` → `types: ./dist/index.d.ts`, `default: ./dist/index.js`, plus `./package.json`); `main` and `types` mirror it for older tooling.
 - **Only `dist/` is published** (`files: ["dist"]`; npm adds `README.md`, `LICENSE` and `package.json` itself). `sideEffects: false`, and `publishConfig.access: public` because scoped packages otherwise publish as restricted.
 - **Currently types-only.** Nothing in `src/` emits runtime code, so `dist/assert/index.js` is just `export {}`. The first runtime export will change assumptions in several places — re-read [Gotchas](#gotchas-and-known-issues) when adding one.
-- Toolchain last verified against: Node 24.15, npm 11.12, TypeScript 5.9.3, Vitest 5.1.0, ESLint 10.11, Prettier 3.9, showroom 0.1.0-alpha.2.
+- Toolchain last verified against: Node 24.15, npm 11.12, TypeScript 5.9.3, Vitest 5.1.0, ESLint 10.11, Prettier 3.9, showroom 0.1.0-alpha.3.
 - **Documentation is also published as a showroom**, built by [`@ofzza/showroom`](https://www.npmjs.com/package/@ofzza/showroom) (a devDependency) from `README.md`, `CONTRIBUTE.md` and `LICENSE`, to GitHub Pages; `package.json`'s `homepage` points there at [ofzza.github.io/TSstd](https://ofzza.github.io/TSstd/). Its navigation is set in `showroom.json`: the README's top-level sections are linked by anchor (`/#type-assertions`, …), so renaming one of those headings means updating `navigation` too (`showroom check` warns about an anchor that leads nowhere).
 
 ## Layout
@@ -35,7 +35,7 @@ tsconfig.build.json        Build config. Extends tsconfig.json, emits to dist/ w
 vite.config.ts             Two Vitest projects: unit, and debug (only with VITEST_DEBUG=1)
 eslint.config.js           ESLint flat config (typescript-eslint + prettier compat, ignores what .gitignore ignores)
 showroom.json              showroom configuration: the typescript stack adapter, ignoring .workflow/, ts showcases shown as source, the navigation
-showroom/                  showroom build output (`npx showroom build`), gitignored
+showroom/                  showroom build output (`npx showroom build --trust`), gitignored
 .prettierrc                Prettier config
 .prettierignore            Paths Prettier skips (dist, node_modules)
 dist/                      Build output, gitignored
@@ -62,10 +62,10 @@ One directory per module under `src/`, each an `index.ts` + `index.test-d.ts` pa
 - `npm run clean` — deletes `dist/` (cross-platform, via `node -e`).
 - `npm run build` — `tsc -p tsconfig.build.json`, compiles `src/` to `dist/` with declarations. `prebuild` runs `clean` first, so renamed or removed modules never leave stale output behind to be published.
 - `npm run dev` — the same in watch mode.
-- `npm run showroom` — `showroom serve`, previews the showroom on a local Vite dev server, rebuilding it as documentation changes. Its `ts` showcases import `@ofzza/tsstd` from `dist/`, so build first (or run `npm run dev` alongside).
+- `npm run showroom` — `showroom serve --trust`, previews the showroom on a local Vite dev server, rebuilding it as documentation changes. Its `ts` showcases import `@ofzza/tsstd` from `dist/`, so build first (or run `npm run dev` alongside).
 - `npm test` — runs every `test:*` script.
   - `npm run test:unit` — `vitest run --project unit`, a single invocation that both executes runtime tests and type checks test files.
-- `npm run ci` — runs every `ci:*` script: `ci:build`, `ci:showroom` (`showroom check --showcases --quiet`: checks the documentation, its links and showcases, and builds every showcase, failing on errors only), `ci:eslint`, `ci:prettier`, `ci:test-unit`. This is what GitHub Actions runs.
+- `npm run ci` — runs every `ci:*` script: `ci:build`, `ci:showroom` (`showroom check --showcases --quiet --trust`: checks the documentation, its links and showcases, and builds every showcase, failing on errors only), `ci:eslint`, `ci:prettier`, `ci:test-unit`. This is what GitHub Actions runs.
 - `npm run prepare` — builds; invoked automatically by a local `npm install`/`npm ci` and before `npm publish`, but **not** when the package is installed as a dependency.
 - `prepublishOnly` — runs `npm run ci` before `npm publish`, so a failing build is never published.
 
@@ -124,12 +124,12 @@ After adding or changing type-level assertions, sanity-check them: break one del
 
 ### Verifying README samples
 
-Every TypeScript sample in `README.md` is a `ts` showcase (` ```ts showcase=ts `), which `ci:showroom` (`showroom check --showcases`) type checks with this repository's TypeScript and root `tsconfig.json`, resolving `@ofzza/tsstd` through `exports` to `dist/`. A type error fails the check at its README line. So:
+Every TypeScript sample in `README.md` is a `ts` showcase (` ```ts showcase=ts `), which `ci:showroom` (`showroom check --showcases --trust`) type checks with this repository's TypeScript and root `tsconfig.json`, resolving `@ofzza/tsstd` through `exports` to `dist/`. A type error fails the check at its README line. So:
 
 - Lines that must compile are written plainly (annotated `// This will work`). A line that must fail is preceded by `// @ts-expect-error <reason>`; an unused one is itself an error (TS2578), so a sample that stops failing fails the check too.
 - Each block is its own module and needs its own `import type { … } from '@ofzza/tsstd';` (TS2304 otherwise).
 - `showroom.json` sets `"showcaseViews": { "ts": "source" }`, so the showroom shows each sample as a code block under its status marks (`build ✓`, `type check ✓`), and never loads its page. Samples log nothing; a sample that should be run and show its console sets `view=` on its marker (e.g. `view=source,console`).
-- Run `npm run build` before `npx showroom check --showcases` when checking by hand, or the samples type check against a stale `dist/`. `npm run ci` builds first.
+- Run `npm run build` before `npx showroom check --showcases --trust` when checking by hand, or the samples type check against a stale `dist/`. `npm run ci` builds first.
 - A sample that can't be a showcase stays a plain code block and is verified by hand: currently the Vitest sample in "Writing type level tests", which imports `vitest` and can't run in a browser frame. Extract it into `./.workflow/.temp/<topic>/` and run `tsc --noEmit` on it.
 - Break one sample deliberately after changing samples, confirm `ci:showroom` fails, and revert, as for the test suite.
 
@@ -157,8 +157,9 @@ The code style is a workflow hard rule: see [Code style](./WORKFLOW.custom.md#co
 - **`keyof` of an index signature depends on how it is written:** `keyof { [key: string]: X }` is `string | number`, but `keyof Record<string, X>` is just `string`.
 - **ESLint's typed-linting block sets `tsconfigRootDir: import.meta.dirname`**, the directory `project: './tsconfig.json'` is resolved against. Left unset, typescript-eslint 8 infers it: reading `ts.configs.*` records the calling config file's directory as a candidate, falling back to `process.cwd()` with no candidate and throwing "multiple candidate TSConfigRootDirs" with more than one (e.g. an editor loading several workspace configs in one process). Setting it explicitly makes linting independent of that heuristic and of the working directory.
 - `.gitignore` ignores `.vscode/` but re-includes `settings.json`, `tasks.json`, `launch.json` and `extensions.json`. Only `extensions.json` and `launch.json` are currently committed; any other `.vscode/` file must be re-included there before it can be.
-- **`ci:showroom` relies on `ci:build` running first.** `npm-run-all ci:*` runs the scripts in `package.json` order, and a `ts` showcase imports `@ofzza/tsstd` by name, which resolves through `exports` to `dist/`. Keep `ci:build` before `ci:showroom`, or run `npm run build` before `npx showroom check --showcases`.
-- **`showroom` is an alpha** (`0.1.0-alpha.2`): its configuration, showcase markers and command line may change in any release. Re-check `showroom.json`, `ci:showroom` and `.github/workflows/showroom.yml` against its README when upgrading it.
+- **`ci:showroom` relies on `ci:build` running first.** `npm-run-all ci:*` runs the scripts in `package.json` order, and a `ts` showcase imports `@ofzza/tsstd` by name, which resolves through `exports` to `dist/`. Keep `ci:build` before `ci:showroom`, or run `npm run build` before `npx showroom check --showcases --trust`.
+- **Every `showroom` command needs `--trust` to build the showcases.** Since alpha.3, `showroom` runs none of the repository's code (showcases included) unless it is trusted: `--trust`, or a yes at the prompt it shows in a terminal. Untrusted, `check --showcases` builds no showcase, so no README sample is type checked, and still passes, with only a warning ("13 showcases not built, as the host repository isn't trusted"); `build` shows every sample as its source, with no status marks. The npm scripts and the Pages workflow pass `--trust`; pass it yourself when running `showroom` by hand. Trust protects nothing here, as `showroom` is this repository's own devDependency, and the repository's code already runs through `npm ci` and the tests.
+- **`showroom` is an alpha** (`0.1.0-alpha.3`): its configuration, showcase markers and command line may change in any release. Re-check `showroom.json`, `ci:showroom` and `.github/workflows/showroom.yml` against its README when upgrading it.
 - **`showroom build` empties its output folder** (`showroom/`) before every build, refusing to if it holds anything but an earlier build's `.showroom` marker. Never point `outDir` at a folder with other content.
 - **`*.gitignore.*` files and `*.gitignore/` directories are local-only** (e.g. `TODO.gitignore.md`), a convention for keeping scratch files next to the code. `.gitignore` ignores them, so never commit them. They are for your own local notes: an agent's working files still go under `./.workflow/.temp/<topic>/` (see [WORKFLOW.md](./WORKFLOW.md) › "Working files").
 
@@ -168,7 +169,7 @@ The code style is a workflow hard rule: see [Code style](./WORKFLOW.custom.md#co
 
 **A workflow alone does not block merges.** Making it mandatory requires branch protection on `master` in GitHub repo settings, marking `CI / Node 22` and `CI / Node 24` as required status checks. That is a repo setting, not a file in this repository.
 
-`.github/workflows/showroom.yml` is a second, separate workflow: on every push to `master` (and on manual dispatch) it runs `npm ci` and `npx showroom build` on Node 24, and publishes `showroom/` to GitHub Pages. It needs two repository settings, outside this repository: Pages' source set to "GitHub Actions", and `master` allowed to deploy to the `github-pages` environment (see [`PUBLISH.md`](./PUBLISH.md) › Showroom on GitHub Pages).
+`.github/workflows/showroom.yml` is a second, separate workflow: on every push to `master` (and on manual dispatch) its `build` job runs `npm ci` and `npx showroom build --trust` on Node 24, with read-only access to the repository, and its `deploy` job, which alone holds `pages: write` and `id-token: write`, publishes `showroom/` to GitHub Pages. This split, from `showroom`'s README, keeps the repository's code, which a trusted build runs, away from the deploy permissions. Both workflows check out with `persist-credentials: false`, so no token is left in `.git/config` for that code to read. It needs two repository settings, outside this repository: Pages' source set to "GitHub Actions", and `master` allowed to deploy to the `github-pages` environment (see [`PUBLISH.md`](./PUBLISH.md) › Showroom on GitHub Pages).
 
 `.github/` also holds `pull_request_template.md` (adapted from the author's template in the `kickstart` repo) and `dependabot.yml` (weekly npm and github-actions updates against `develop`, with devDependencies grouped into one pull request, and `@types/node` majors ignored).
 

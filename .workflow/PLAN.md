@@ -113,6 +113,20 @@ How the [specification](./SPEC.md) is built. Drafted on 2026-11-04 from the repo
   - `AGENTS.md`: toolchain line and alpha gotcha at alpha.2; the navigation and its README anchors under Project; `showroom.json` in Layout; the `source` view under Verifying README samples. SPEC › Pitfalls at alpha.2.
 - **Documentation and tests:** the documents above. The README samples stay type checked by `ci:showroom`; their views don't change what is checked.
 
+## S11. `showroom` alpha.3
+
+- **Goal:** your request of 2026-11-18 to update `@ofzza/showroom` to its latest version (0.1.0-alpha.3) and make whatever changes the showroom needs to keep building correctly.
+- **Status:** approved 2026-11-18, implemented.
+- **Findings** (tested in a throwaway copy of the repository): `showroom.json` needs no change. alpha.3 adds trust: unless `--trust` is given (or confirmed at a terminal prompt), `showroom` runs none of the repository's code, so `check --showcases` builds no showcase, and passes with only a warning. Without `--trust`, `ci:showroom` would silently stop type checking the README samples. With it, a deliberately broken sample fails the check, `npm run ci` passes, and `showroom build --trust` builds.
+- **Steps:**
+  - Upgrade `@ofzza/showroom` to `^0.1.0-alpha.3`.
+  - `package.json`: `ci:showroom` is `showroom check --showcases --quiet --trust`, always, pull requests included (your choice over trusting only on push: `ci.yml` uses `pull_request`, with a read-only token and no secrets, and `npm ci` and Vitest already run a pull request's code); `showroom` is `showroom serve --trust` (your choice over the terminal prompt).
+  - `.github/workflows/showroom.yml`: split into a `build` job that can only read the repository (checkout with `persist-credentials: false`, `npx showroom build --trust`) and a `deploy` job holding `pages: write` and `id-token: write`, as `showroom`'s README recommends (your choice over only adding `--trust`).
+  - `.github/workflows/ci.yml`: checkout with `persist-credentials: false` (your choice).
+  - `AGENTS.md`: toolchain line and alpha gotcha at alpha.3; `--trust` in Commands, Verifying README samples and the gotchas; a gotcha that an untrusted check passes without building any showcase; the Pages workflow's two jobs under Continuous integration. README `# Development`: `npm run showroom` and `ci:showroom` with `--trust`. SPEC › Pitfalls at alpha.3. `PUBLISH.md` needs no change: it names the workflow, not its steps.
+  - `CONTRIBUTE.md`: the showroom link's lowercase `/tsstd/`, a 404, fixed to `/TSstd/` (found while checking).
+- **Documentation and tests:** the documents above. The README samples stay type checked by `ci:showroom`, which is checked by breaking one sample and confirming the check fails.
+
 ## Known open issues
 
 - **K1. Preparing for the first runtime export.** This is deferred: the specification currently covers only existing, types-only work, and no runtime export has been asked for. It takes the pitfall "The first runtime export breaks types-only assumptions", and is picked up when a runtime export enters the specification.

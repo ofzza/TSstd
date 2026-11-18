@@ -10,8 +10,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # One deployment at a time, and never cancel one in progress
 concurrency:
@@ -19,27 +17,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  # Runs the repository's code (`showroom build --trust` builds its showcases), so it can only read the repository,
+  # and never holds the deploy job's Pages permissions
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: npm
 
-      # Plain `npm ci` (see ci.yml); its `prepare` script also builds `dist/`
+      # Plain `npm ci` (see ci.yml); its `prepare` script also builds `dist/`, which the showcases import
       - run: npm ci
 
-      - run: npx showroom build
+      - run: npx showroom build --trust
 
       - uses: actions/upload-pages-artifact@v5
         with:
           path: showroom
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - id: deployment
         uses: actions/deploy-pages@v5

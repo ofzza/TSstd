@@ -23,7 +23,10 @@ jobs:
       matrix:
         node: [22, 24]
     steps:
+      # No token left in .git/config: CI never pushes, and `ci:showroom` runs the repository's code under `--trust`
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v7
         with:
@@ -34,5 +37,5 @@ jobs:
       # `@parcel/watcher` rely on to link their native bindings
       - run: npm ci
 
-      # Build, ESLint, Prettier and tests, run sequentially by `npm-run-all ci:*`
+      # Build, the showroom check, ESLint, Prettier and tests, run sequentially by `npm-run-all ci:*`
       - run: npm run ci

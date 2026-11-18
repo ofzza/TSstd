@@ -3,8 +3,8 @@
 ## Next session: start here
 
 - **Stage:** planning.
-- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2, S9.3 and S9.5 are implemented, committed and pushed (branch `showroom`, pushed to and tracking `origin/showroom`; `origin/tsshowcase` holds the S9 commits only). S10 (`showroom` alpha.2) is implemented and committed. The draft segments S6 and S7 wait for approval.
-- **Next step:** S9.4 (check how npmjs.com renders relative links first).
+- **Being worked on:** the approved segment S9 in [PLAN.md](./PLAN.md); S9.1, S9.2, S9.3 and S9.5 are implemented, committed and pushed (branch `showroom`, pushed to and tracking `origin/showroom`; `origin/tsshowcase` holds the S9 commits only). S10 (`showroom` alpha.2) is implemented and committed. S11 (`showroom` alpha.3) is implemented and committed, not pushed; its split Pages workflow first runs on the next push to `master`. The draft segments S6 and S7 wait for approval.
+- **Next step:** S9.4 (check how npmjs.com renders relative links first). 
 
 ## Open questions
 
@@ -14,6 +14,7 @@
 ## Waiting on me
 
 - Approval of each draft plan segment (S6, S7).
+- Confirming that S11's results are recorded, so `.workflow/.temp/showroom-alpha3/` can be deleted.
 
 ## Running
 
@@ -41,3 +42,6 @@ None.
 - 2026-11-16: At your request, the showroom navigation's Project group ungrouped: Development, Contributing and License at the top level.
 - 2026-11-16: Released `0.1.0-alpha.2` to npm (your `/ig-repo publish`), published under the `alpha` dist-tag, then set as `latest` at your request.
 - 2026-11-16: Fast path, at your request ("Let's fix the link (2)"): the showroom links point at `ofzza.github.io/TSstd/`, as the lowercase `/tsstd/` was a 404 (the Pages path is case-sensitive); npm's `homepage` stays broken until the next release.
+- 2026-11-18: Drafted S11 (`showroom` alpha.3) at your request, after testing alpha.3 in a copy of the repository; its choices settled: `--trust` always in `ci:showroom` and `npm run showroom`, the Pages workflow split into build and deploy jobs, `persist-credentials: false` in `ci.yml`.
+- 2026-11-18: S11 approved ("Approve S11"), and implemented.
+- 2026-11-18: S11 checkpoint approved ("Approve and commit").
