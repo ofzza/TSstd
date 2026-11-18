@@ -18,7 +18,7 @@
 
 ## Running
 
-- `npm run showroom` (showroom serve), at http://localhost:5174/, for your review.
+None.
 
 ## History
 
